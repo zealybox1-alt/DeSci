@@ -1,1643 +1,1016 @@
 
-<DOCTYPE html>
-  <html lang="en">
-    <head>
-      <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OpenDeSci - Community Hub</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-    
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      line-height: 1.6;
-      color: #333;
-      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-      min-height: 100vh;
-    }
-    
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 20px;
-    }
-    
-    /* Navigation */
-    .nav {
-      background: #2c3e50;
-      color: white;
-      padding: 15px 0;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-    
-    .nav .container {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    
-    .logo {
-      font-size: 24px;
-      font-weight: bold;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      width: 100%;
-    }
-    
-    #menu-btn {
-      display: none;
-      background: none;
-      border: none;
-      color: white;
-      font-size: 24px;
-      cursor: pointer;
-    }
-    
-    .sidebar {
-      display: block;
-    }
-    
-    .sidebar ul {
-      display: flex;
-      list-style: none;
-    }
-    
-    .sidebar li {
-      margin: 0 15px;
-    }
-    
-    .sidebar a {
-      color: white;
-      text-decoration: none;
-      transition: color 0.3s;
-      font-weight: 500;
-    }
-    
-    .sidebar a:hover {
-      color: #3498db;
-    }
-    
-    .voice-btn {
-      background: #e74c3c;
-      color: white;
-      border: none;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      cursor: pointer;
-      font-size: 18px;
-      transition: background 0.3s;
-    }
-    
-    .voice-btn:hover {
-      background: #c0392b;
-    }
-    
-    /* Hero Section */
-    .hero {
-      text-align: center;
-      padding: 60px 20px;
-      background: white;
-      margin: 20px;
-      border-radius: 10px;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    }
-    
-    .hero h1 {
-      font-size: 2.5rem;
-      margin-bottom: 20px;
-      color: #2c3e50;
-    }
-    
-    .hero p {
-      font-size: 1.2rem;
-      margin-bottom: 30px;
-      color: #7f8c8d;
-      max-width: 800px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    
-    .btn {
-      background: #3498db;
-      color: white;
-      border: none;
-      padding: 12px 25px;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 1rem;
-      transition: background 0.3s;
-      font-weight: 600;
-    }
-    
-    .btn:hover {
-      background: #2980b9;
-    }
-    
-    /* Cards */
-    .card {
-      background: white;
-      padding: 30px;
-      margin: 20px;
-      border-radius: 10px;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    }
-    
-    .card h2 {
-      color: #2c3e50;
-      margin-bottom: 20px;
-      padding-bottom: 10px;
-      border-bottom: 2px solid #3498db;
-    }
-    
-    /* Video Container */
-    .video-container {
-      width: 100%;
-      height: 500px;
-      background: #1a1a1a;
-      border-radius: 8px;
-      margin: 20px 0;
-      position: relative;
-      overflow: hidden;
-    }
-    
-    /* Video Grid */
-    .video-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      grid-template-rows: repeat(4, 1fr);
-      gap: 10px;
-      width: 100%;
-      height: 100%;
-      padding: 10px;
-    }
-    
-    .video-item {
-      background: #2c3e50;
-      border-radius: 8px;
-      overflow: hidden;
-      position: relative;
-    }
-    
-    .video-item video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    
-    .video-item .name-overlay {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: rgba(0, 0, 0, 0.7);
-      color: white;
-      padding: 5px;
-      font-size: 12px;
-    }
-    
-    /* Audio Mode */
-    .audio-mode {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-      gap: 15px;
-      padding: 20px;
-    }
-    
-    .participant-card {
-      background: #34495e;
-      border-radius: 10px;
-      padding: 15px;
-      text-align: center;
-      color: white;
-    }
-    
-    .participant-card .avatar {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      margin: 0 auto 10px;
-      background: #3498db;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 24px;
-    }
-    
-    .participant-card.host {
-      background: #e74c3c;
-    }
-    
-    .participant-card.speaker {
-      background: #f39c12;
-    }
-    
-    /* Promo Video */
-    .promo-video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    
-    .promo-controls {
-      position: absolute;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      gap: 10px;
-    }
-    
-    /* Live Banner */
-    .live-banner {
-      background: #e74c3c;
-      color: white;
-      padding: 12px;
-      text-align: center;
-      margin-bottom: 15px;
-      border-radius: 5px;
-      display: none;
-      font-weight: bold;
-    }
-    
-    /* Buttons */
-    .join-live-btn {
-      display: inline-block;
-      padding: 12px 25px;
-      background: #e74c3c;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 1rem;
-      margin: 10px 0;
-      transition: background 0.3s;
-      font-weight: 600;
-    }
-    
-    .join-live-btn:hover {
-      background: #c0392b;
-    }
-    
-    /* Admin Button */
-    .admin-btn {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      background: #2c3e50;
-      color: white;
-      border: none;
-      cursor: pointer;
-      font-size: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-      z-index: 1000;
-      transition: background 0.3s, transform 0.3s;
-    }
-    
-    .admin-btn:hover {
-      background: #3498db;
-      transform: scale(1.1);
-    }
-    
-    /* Modals */
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      align-items: center;
-      justify-content: center;
-      z-index: 2000;
-    }
-    
-    .modal-content {
-      background: white;
-      padding: 30px;
-      border-radius: 10px;
-      text-align: center;
-      width: 90%;
-      max-width: 500px;
-      box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
-    }
-    
-    .modal-content h3 {
-      margin-bottom: 20px;
-      color: #2c3e50;
-    }
-    
-    .modal-content input, .modal-content textarea, .modal-content select {
-      width: 100%;
-      padding: 12px;
-      margin: 10px 0;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      font-size: 1rem;
-    }
-    
-    .modal-content textarea {
-      height: 100px;
-      resize: vertical;
-    }
-    
-    .modal-content button {
-      margin: 5px;
-      padding: 10px 20px;
-    }
-    
-    /* Admin Panel */
-    .admin-panel {
-      display: none;
-      margin: 20px;
-      padding: 25px;
-      border: 1px solid #ddd;
-      background: #f8f9fa;
-      border-radius: 10px;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    }
-    
-    .admin-panel h2 {
-      color: #2c3e50;
-      margin-bottom: 20px;
-      padding-bottom: 10px;
-      border-bottom: 2px solid #3498db;
-    }
-    
-    .admin-panel button {
-      margin: 5px;
-      padding: 10px 15px;
-      background: #3498db;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-    
-    .admin-panel button:hover {
-      background: #2980b9;
-    }
-    
-    /* Mode Selector in Admin Panel */
-    .mode-selector {
-      display: flex;
-      gap: 15px;
-      margin: 20px 0;
-    }
-    
-    .mode-btn {
-      padding: 10px 20px;
-      background: #ddd;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-weight: 600;
-      transition: background 0.3s;
-    }
-    
-    .mode-btn.active {
-      background: #3498db;
-      color: white;
-    }
-    
-    /* Participant and Mic Request Lists */
-    .list-container {
-      margin-top: 20px;
-      padding: 15px;
-      background: white;
-      border-radius: 8px;
-      border: 1px solid #ddd;
-    }
-    
-    .list-container h4 {
-      margin-bottom: 15px;
-      color: #2c3e50;
-    }
-    
-    .participant-item, .mic-request-item, .event-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px;
-      border-bottom: 1px solid #eee;
-    }
-    
-    .participant-item:last-child, .mic-request-item:last-child, .event-item:last-child {
-      border-bottom: none;
-    }
-    
-    .participant-item button, .mic-request-item button, .event-item button {
-      margin-left: 5px;
-      padding: 5px 10px;
-      font-size: 12px;
-      border-radius: 3px;
-      border: none;
-      cursor: pointer;
-      color: white;
-    }
-    
-    .btn-approve {
-      background: #2ecc71;
-    }
-    
-    .btn-reject, .btn-delete {
-      background: #e74c3c;
-    }
-    
-    .btn-mute {
-      background: #f39c12;
-    }
-    
-    .btn-remove {
-      background: #e74c3c;
-    }
-    
-    .btn-edit {
-      background: #3498db;
-    }
-    
-    /* Events */
-    .events-container {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 20px;
-      margin-top: 20px;
-      transition: all 0.3s ease;
-    }
-    
-    .event-card {
-      border: 1px solid #ddd;
-      padding: 20px;
-      border-radius: 8px;
-      background: white;
-      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-      transition: transform 0.3s, box-shadow 0.3s;
-    }
-    
-    .event-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    }
-    
-    .event-card h3 {
-      color: #2c3e50;
-      margin-bottom: 10px;
-    }
-    
-    .event-card p {
-      color: #7f8c8d;
-      margin-bottom: 10px;
-    }
-    
-    .event-card .event-date {
-      color: #e74c3c;
-      font-weight: bold;
-    }
-    
-    .countdown {
-      font-size: 1.2rem;
-      font-weight: bold;
-      color: #2c3e50;
-      margin-top: 10px;
-    }
-    
-    /* Toast notifications */
-    #toast {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #333;
-      color: #fff;
-      padding: 10px 20px;
-      border-radius: 5px;
-      z-index: 10000;
-      opacity: 0;
-      transition: opacity 0.3s;
-    }
-    
-    /* Responsive Design */
-    @media (max-width: 768px) {
-      .nav .container {
-        flex-direction: column;
-      }
-      
-      #menu-btn {
-        display: block;
-      }
-      
-      .sidebar {
-        display: none;
-        width: 100%;
-      }
-      
-      .sidebar.active {
-        display: block;
-      }
-      
-      .sidebar ul {
-        flex-direction: column;
-        margin-top: 20px;
-      }
-      
-      .sidebar li {
-        margin: 10px 0;
-      }
-      
-      .video-container {
-        height: 300px;
-      }
-      
-      .video-grid {
-        grid-template-columns: repeat(2, 1fr);
-        grid-template-rows: repeat(2, 1fr);
-      }
-      
-      .hero h1 {
-        font-size: 2rem;
-      }
-      
-      .events-container {
-        grid-template-columns: 1fr;
-      }
-      
-      .admin-panel {
-        margin: 10px;
-        padding: 15px;
-      }
-      
-      .audio-mode {
-        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-      }
-      
-      .mode-selector {
-        flex-direction: column;
-      }
-    }
-    
-    /* Animations */
-    .fade-in {
-      animation: fadeIn 1s;
-    }
-    
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-    
-    /* Loading Spinner */
-    .spinner {
-      border: 4px solid rgba(0, 0, 0, 0.1);
-      border-left: 4px solid #3498db;
-      border-radius: 50%;
-      width: 30px;
-      height: 30px;
-      animation: spin 1s linear infinite;
-      margin: 20px auto;
-    }
-    
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-  </style>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community Hub</title>
+    <style>
+        /* Dark Theme CSS */
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        /* Hero Section */
+        #hero {
+            position: relative;
+            width: 100%;
+            height: 60vh;
+        }
+        .aspect-16-9 {
+            position: relative;
+            padding-top: 56.25%; /* 16:9 Aspect Ratio */
+            background-color: #1f1f1f;
+        }
+        #promo-video, #jitsi-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        #promo-video {
+            object-fit: cover;
+        }
+        /* Overlays */
+        .overlay {
+            position: absolute;
+            z-index: 10;
+            width: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+        }
+        .overlay-top {
+            top: 10px;
+        }
+        .overlay-bottom {
+            bottom: 10px;
+        }
+        .joiner-chip {
+            background-color: rgba(31, 31, 31, 0.8);
+            border-radius: 20px;
+            padding: 5px 10px;
+            margin: 5px;
+            display: flex;
+            align-items: center;
+        }
+        .joiner-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        /* Mobile adjustments */
+        @media (max-width: 768px) {
+            .overlay-top .joiner-chip:nth-child(n+4),
+            .overlay-bottom .joiner-chip:nth-child(n+4) {
+                display: none;
+            }
+        }
+        /* Join Button */
+        #join-live-btn {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 10;
+        }
+        /* Open Space UI */
+        #open-space-ui {
+            display: none;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .participant-card {
+            background-color: #1f1f1f;
+            border-radius: 10px;
+            padding: 10px;
+            margin: 10px;
+            width: 150px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        }
+        .participant-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+        }
+        .role-host { color: #ff9800; }
+        .role-speaker { color: #4caf50; }
+        .role-listener { color: #9e9e9e; }
+        #reactions {
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            z-index: 20;
+        }
+        .reaction-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        #hide-listeners-btn, #minimize-btn, #record-btn {
+            background-color: #333;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            margin: 5px;
+            cursor: pointer;
+        }
+        #minimized-bar {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: #1f1f1f;
+            padding: 10px;
+            text-align: center;
+            z-index: 30;
+        }
+        /* Events Carousel */
+        #events-section {
+            margin-top: 40px;
+        }
+        .carousel {
+            display: flex;
+            overflow: hidden;
+            position: relative;
+        }
+        .carousel-inner {
+            display: flex;
+            transition: transform 0.5s ease;
+        }
+        .event-card {
+            background-color: #1f1f1f;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 10px;
+            width: 300px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+            flex-shrink: 0;
+        }
+        /* Admin Panel */
+        #admin-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            z-index: 20;
+            display: none;
+        }
+        #admin-panel {
+            display: none;
+            background-color: #1f1f1f;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 800px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+        .admin-card {
+            margin-bottom: 20px;
+        }
+        .toggle-btn {
+            background-color: #333;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        /* Modals */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            z-index: 50;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #1f1f1f;
+            padding: 20px;
+            border-radius: 10px;
+            width: 300px;
+            text-align: center;
+        }
+        /* Toasts */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #333;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            z-index: 40;
+            display: none;
+        }
+        /* Animations */
+        @keyframes slide {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-33.33%); }
+        }
+        .animating .carousel-inner {
+            animation: slide 4s infinite;
+        }
+        /* Responsive */
+        @media (max-width: 768px) {
+            .event-card {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
-  <main id="app">
-    <header class="nav" role="navigation" aria-label="Main navigation">
-      <div class="container">
-        <div class="logo">OpenDeSci
-          <button id="menu-btn" aria-label="Toggle menu">☰</button>
+    <div class="container">
+        <div id="hero">
+            <div class="aspect-16-9" id="video-placeholder">
+                <video id="promo-video" muted loop></video>
+                <div id="jitsi-container"></div>
+            </div>
+            <div class="overlay overlay-top" id="speakers-overlay"></div>
+            <div class="overlay overlay-bottom" id="listeners-overlay"></div>
+            <button id="join-live-btn" style="display: none;">Join Live</button>
         </div>
-        <nav id="sidebar" class="sidebar">
-          <ul>
-            <li><a href="#/home" aria-label="Home page">Home</a></li>
-            <li><a href="#/learn" aria-label="Learn about DeSci">Learn</a></li>
-            <li><a href="#/contribute" aria-label="Contribute to DeSci">Contribute</a></li>
-            <li><a href="#/fund-build" aria-label="Fund and Build DeSci">Fund & Build</a></li>
-            <li><a href="#/community" aria-label="Join DeSci Community">Community</a></li>
-            <li><a href="#/future" aria-label="Explore the Future of DeSci">Future</a></li>
-            <li><a href="#/explore" aria-label="Explore DeSci Projects">Project Explorer</a></li>
-          </ul>
-        </nav>
-        <div>
-          <button onclick="startVoice()" class="voice-btn" aria-label="Start voice navigation">🎙️</button>
+        <div id="open-space-ui">
+            <div id="participants-list"></div>
+            <div id="reactions">
+                <button class="reaction-btn" data-emoji="❤️">❤️</button>
+                <button class="reaction-btn" data-emoji="👏">👏</button>
+                <button class="reaction-btn" data-emoji="🔥">🔥</button>
+            </div>
+            <button id="request-mic-btn" style="display: none;">Request Mic</button>
+            <button id="hide-listeners-btn">Hide Listeners</button>
+            <button id="minimize-btn">Minimize</button>
+            <button id="record-btn" style="display: none;">Record</button>
         </div>
-      </div>
-    </header>
-
-    <section class="hero fade-in" role="banner">
-      <h1>Join the DeSci Community</h1>
-      <p>Connect with researchers, developers, and enthusiasts to collaborate on DeSci.</p>
-      <button class="btn" onclick="location.hash='/community'" aria-label="Join the community">Join Now</button>
-      
-      <!-- Video/Audio Container -->
-      <div class="video-container" id="video-container">
-        <div class="video-grid" id="video-grid"></div>
-        <div class="audio-mode" id="audio-mode" style="display: none;"></div>
-        <video class="promo-video" id="promo-video" controls style="display: none;">
-          <source src="https://assets.codepen.io/3364143/sample.mp4" type="video/mp4">
-          Your browser does not support the video tag.
-        </video>
-        <div class="promo-controls" id="promo-controls" style="display: none;">
-          <button class="btn" onclick="togglePromoVideo()">Pause Promo</button>
+        <div id="minimized-bar">
+            Open Space Running <button id="restore-btn">Restore</button>
         </div>
-      </div>
-      
-      <div id="live-banner" class="live-banner">🔴 Live Now on <span id="live-platform"></span></div>
-      <button class="join-live-btn" id="join-live-btn">Join Live</button>
-    </section>
-
-    <section class="card fade-in" id="leaderboard" aria-labelledby="leaderboard-heading">
-      <h2 id="leaderboard-heading">Community Leaderboard</h2>
-      <p>Meet our top contributors driving DeSci forward.</p>
-      <div class="profile-grid">
-        <div class="event-card">
-          <h3>Top Contributor: Dr. Jane Smith</h3>
-          <p>Published 12 research papers on decentralized science</p>
+        <div id="events-section">
+            <h2>Events</h2>
+            <div class="carousel">
+                <div class="carousel-inner" id="events-carousel">
+                    <!-- Cards: Live Events, Hosted Calls, Upcoming -->
+                </div>
+            </div>
         </div>
-        <div class="event-card">
-          <h3>Innovator: Alex Johnson</h3>
-          <p>Developed novel data sharing protocol</p>
-        </div>
-      </div>
-    </section>
-
-    <section class="card fade-in live-streaming" aria-labelledby="live-streaming-heading">
-      <h2 id="live-streaming-heading">Live Events</h2>
-      <div id="live-container"></div>
-    </section>
-
-    <section class="card fade-in hosted-calls" aria-labelledby="hosted-calls-heading">
-      <h2 id="hosted-calls-heading">Hosted Calls</h2>
-      <div id="hosted-call-container" class="events-container">
-        <div class="event-card">
-          <h3>Weekly DeSci Discussion</h3>
-          <p class="event-date">Every Thursday, 5 PM UTC</p>
-          <p>Join our weekly community call to discuss DeSci developments</p>
-        </div>
-      </div>
-    </section>
-
-<section class="card fade-in upcoming-events" aria-labelledby="upcoming-events-heading">
-      <h2 id="upcoming-events-heading">Upcoming Events</h2>
-      <div id="upcoming-events-container" class="events-container">
-        <!-- Events will be loaded here -->
-      </div>
-    </section>
-
-    <section class="card fade-in past-events" aria-labelledby="past-events-heading">
-      <h2 id="past-events-heading">Past Events</h2>
-      <div id="past-events-container" class="events-container">
-        <!-- Past events will be loaded here -->
-      </div>
-    </section>
-
-    <div class="admin-panel" id="admin-panel">
-      <h2>Admin Panel</h2>
-      <button onclick="scheduleLive()">Schedule Live</button>
-      <button onclick="startLive()" id="start-live-btn">Start Live</button>
-      <button onclick="endLive()" id="end-live-btn">End Live</button>
-      <button onclick="muteAll()">Mute All</button>
-      <button onclick="togglePromoVideo()" id="promo-toggle-btn">Pause Promo</button>
-      
-      <div class="mode-selector">
-        <button class="mode-btn active" onclick="setMode('video')">Video Mode</button>
-        <button class="mode-btn" onclick="setMode('audio')">Audio Mode</button>
-      </div>
-      
-      <div class="list-container">
-        <h4>Event Management</h4>
-        <div id="event-management">
-          <p>No events scheduled</p>
-        </div>
-      </div>
-      
-      <div class="list-container">
-        <h4>Microphone Requests</h4>
-        <div id="mic-requests"></div>
-      </div>
-      
-      <div class="list-container">
-        <h4>Participants</h4>
-        <div id="participants"></div>
-      </div>
-      
-      <button onclick="logoutAdmin()">Logout</button>
     </div>
-    
-    <div class="modal" id="password-modal">
-      <div class="modal-content">
-        <h3>Admin Login</h3>
-        <input type="password" id="admin-password" placeholder="Enter password">
-        <button onclick="loginAdmin()">Login</button>
-        <button onclick="closeModal('password-modal')">Cancel</button>
-      </div>
+    <button id="admin-btn">Admin Panel</button>
+    <div id="admin-panel">
+        <h2>Admin Panel</h2>
+        <div class="admin-card">
+            <button class="toggle-btn" data-target="settings-card">Toggle Settings</button>
+            <div id="settings-card" style="display: none;">
+                <h3>Settings</h3>
+                <button id="start-live-btn">Start Live</button>
+                <button id="end-live-btn">End Live</button>
+                <button id="restart-live-btn">Restart Live</button>
+                <select id="mode-select">
+                    <option value="video">Video</option>
+                    <option value="audio">Open Space</option>
+                </select>
+                <input id="promo-url-input" placeholder="Promo Video URL">
+                <button id="save-promo-btn">Save Promo</button>
+                <input id="rtmp-url-input" placeholder="RTMP URL">
+                <input id="stream-key-input" placeholder="Stream Key">
+                <button id="start-broadcast-btn">Start Broadcast</button>
+                <select id="public-private-select">
+                    <option value="public">Public</option>
+                    <option value="private">Private</option>
+                </select>
+                <div id="invites-section" style="display: none;">
+                    <input id="invite-user-input" placeholder="User ID to Invite">
+                    <button id="add-invite-btn">Add Invite</button>
+                    <div id="invites-list"></div>
+                </div>
+                <button id="pause-promo-btn">Pause Promo</button>
+            </div>
+        </div>
+        <div class="admin-card">
+            <button class="toggle-btn" data-target="participants-card">Toggle Participants</button>
+            <div id="participants-card" style="display: none;">
+                <h3>Participants</h3>
+                <div id="participants-list-admin"></div>
+                <div id="mic-requests"></div>
+            </div>
+        </div>
+        <div class="admin-card">
+            <button class="toggle-btn" data-target="events-card">Toggle Event Management</button>
+            <div id="events-card" style="display: none;">
+                <h3>Event Management</h3>
+                <input id="event-title" placeholder="Title">
+                <input id="event-date" type="date">
+                <textarea id="event-desc" placeholder="Description"></textarea>
+                <button id="create-event-btn">Create Event</button>
+                <div id="events-list-admin"></div>
+            </div>
+        </div>
     </div>
-    
-    <div class="modal" id="schedule-modal">
-      <div class="modal-content">
-        <h3>Schedule Live Event</h3>
-        <input type="text" id="event-title" placeholder="Title">
-        <input type="datetime-local" id="event-time">
-        <select id="event-type">
-          <option value="video">Video Mode</option>
-          <option value="audio">Audio Mode</option>
-        </select>
-        <textarea id="event-description" placeholder="Description"></textarea>
-        <button onclick="saveEvent()">Save</button>
-        <button onclick="closeModal('schedule-modal')">Cancel</button>
-      </div>
+    <!-- Modals -->
+    <div id="auth-modal" class="modal">
+        <div class="modal-content">
+            <h2>Login / Register</h2>
+            <input id="email" type="email" placeholder="Email">
+            <input id="password" type="password" placeholder="Password">
+            <button id="login-btn">Login</button>
+            <button id="register-btn">Register</button>
+        </div>
     </div>
+    <div id="profile-modal" class="modal">
+        <div class="modal-content">
+            <h2>Set Profile</h2>
+            <input id="username" placeholder="Username">
+            <input id="bio" placeholder="Bio">
+            <input id="avatar-upload" type="file" accept="image/*">
+            <button id="save-profile-btn">Save</button>
+        </div>
+    </div>
+    <div id="toast" class="toast"></div>
 
-    <div class="modal" id="edit-modal">
-      <div class="modal-content">
-        <h3>Edit Event</h3>
-        <input type="hidden" id="edit-id">
-        <input type="text" id="edit-title" placeholder="Title">
-        <input type="datetime-local" id="edit-time">
-        <select id="edit-type">
-          <option value="video">Video Mode</option>
-          <option value="audio">Audio Mode</option>
-        </select>
-        <textarea id="edit-description" placeholder="Description"></textarea>
-        <button onclick="updateEvent()">Update</button>
-        <button onclick="closeModal('edit-modal')">Cancel</button>
-      </div>
-    </div>
-  </main>
-  
-  <button class="admin-btn" id="admin-btn">👤</button>
-  
-  <div id="toast"></div>
-  
-  <!-- Jitsi Meet API -->
-  <script src="https://meet.jit.si/external_api.js"></script>
-
+    <!-- Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js"></script>
+    <script src="https://meet.jit.si/external_api.js"></script>
     <script>
-    // ===== COMMUNITY HUB IMPLEMENTATION =====
-
-    // Global variables for Community Hub
-    let api = null;
-    let isAdmin = false;
-    let participants = [];
-    let micRequests = [];
-    let isLive = false;
-    let currentMode = 'video';
-    let promoPlaying = false;
-    let eventsData = [];
-    const ADMIN_PASSWORD = "admin123"; // Simple password for demo
-
-    // Initialize when page loads
-    document.addEventListener('DOMContentLoaded', function() {
-      // Set up admin button
-      const adminBtn = document.getElementById('admin-btn');
-      if (adminBtn) {
-        adminBtn.addEventListener('click', openPasswordModal);
-      }
-      
-      // Set up join live button
-      const joinLiveBtn = document.getElementById('join-live-btn');
-      if (joinLiveBtn) {
-        joinLiveBtn.style.display = 'none';
-        joinLiveBtn.addEventListener('click', joinLiveMeeting);
-      }
-      
-      // Set up live banner
-      const liveBanner = document.getElementById('live-banner');
-      if (liveBanner) {
-        liveBanner.style.display = 'none';
-      }
-      
-      // Set default video placeholder
-      setDefaultVideoPlaceholder();
-      
-      // Load events
-      loadEvents();
-      
-      // Check if user was previously logged in
-      const adminSession = localStorage.getItem('adminSession');
-      if (adminSession === 'true') {
-        isAdmin = true;
-        const adminPanel = document.getElementById('admin-panel');
-        if (adminPanel) adminPanel.style.display = 'block';
-      }
-    });
-
-    // Set video/audio mode
-    function setMode(mode) {
-      currentMode = mode;
-      
-      const videoModeBtn = document.querySelector('.mode-btn[onclick="setMode(\'video\')"]');
-      const audioModeBtn = document.querySelector('.mode-btn[onclick="setMode(\'audio\')"]');
-      const videoGrid = document.getElementById('video-grid');
-      const audioMode = document.getElementById('audio-mode');
-      
-      if (videoModeBtn && audioModeBtn) {
-        if (mode === 'video') {
-          videoModeBtn.classList.add('active');
-          audioModeBtn.classList.remove('active');
-          if (videoGrid) videoGrid.style.display = 'grid';
-          if (audioMode) audioMode.style.display = 'none';
-        } else {
-          videoModeBtn.classList.remove('active');
-          audioModeBtn.classList.add('active');
-          if (videoGrid) videoGrid.style.display = 'none';
-          if (audioMode) audioMode.style.display = 'grid';
-        }
-      }
-      
-      // If live, restart with new mode
-      if (isLive && api) {
-        endLive();
-        setTimeout(startLive, 1000);
-      }
-    }
-
-    // Play promo video
-    function playPromoVideo() {
-      const promoVideo = document.getElementById('promo-video');
-      const promoControls = document.getElementById('promo-controls');
-      
-      if (promoVideo && promoControls) {
-        promoVideo.style.display = 'block';
-        promoControls.style.display = 'flex';
-        promoVideo.play().catch(e => console.error('Promo video play error:', e));
-        promoPlaying = true;
-        
-        const promoBtn = document.getElementById('promo-toggle-btn');
-        if (promoBtn) promoBtn.textContent = 'Pause Promo';
-      }
-    }
-
-    // Pause/play promo video
-    function togglePromoVideo() {
-      const promoVideo = document.getElementById('promo-video');
-      const promoBtn = document.getElementById('promo-toggle-btn');
-      
-      if (promoVideo) {
-        if (promoPlaying) {
-          promoVideo.pause();
-          if (promoBtn) promoBtn.textContent = 'Play Promo';
-          promoPlaying = false;
-        } else {
-          promoVideo.play();
-          if (promoBtn) promoBtn.textContent = 'Pause Promo';
-          promoPlaying = true;
-        }
-      }
-    }
-
-    // Password modal functions
-    function openPasswordModal() {
-      const passwordModal = document.getElementById('password-modal');
-      const adminPasswordInput = document.getElementById('admin-password');
-      
-      if (passwordModal && adminPasswordInput) {
-        passwordModal.style.display = 'flex';
-        adminPasswordInput.value = '';
-      }
-    }
-
-    function closeModal(modalId) {
-      const modal = document.getElementById(modalId);
-      if (modal) modal.style.display = 'none';
-    }
-
-    function loginAdmin() {
-      const adminPasswordInput = document.getElementById('admin-password');
-      if (!adminPasswordInput) return;
-      
-      const password = adminPasswordInput.value;
-      
-      if (password === ADMIN_PASSWORD) {
-        isAdmin = true;
-        const adminPanel = document.getElementById('admin-panel');
-        if (adminPanel) adminPanel.style.display = 'block';
-        
-        const passwordModal = document.getElementById('password-modal');
-        if (passwordModal) passwordModal.style.display = 'none';
-        
-        // Store admin session
-        localStorage.setItem('adminSession', 'true');
-        showToast('Admin login successful');
-      } else {
-        alert('Incorrect password. Please try again.');
-      }
-    }
-
-    function logoutAdmin() {
-      isAdmin = false;
-      const adminPanel = document.getElementById('admin-panel');
-      if (adminPanel) adminPanel.style.display = 'none';
-      localStorage.removeItem('adminSession');
-      showToast('Admin logged out');
-    }
-
-    // Video placeholder functions
-    function setDefaultVideoPlaceholder() {
-      const videoContainer = document.getElementById('video-container');
-      if (videoContainer) {
-        videoContainer.innerHTML = `
-          <video class="promo-video" id="promo-video" controls>
-            <source src="https://assets.codepen.io/3364143/sample.mp4" type="video/mp4">
-            Your browser does not support the video tag.
-          </video>
-          <div class="promo-controls" id="promo-controls">
-            <button class="btn" onclick="togglePromoVideo()">Pause Promo</button>
-          </div>
-        `;
-        
-        // Initialize promo video
-        playPromoVideo();
-      }
-    }
-
-    function setLiveVideoPlaceholder() {
-      const videoContainer = document.getElementById('video-container');
-      if (videoContainer) {
-        videoContainer.innerHTML = `
-          <div class="video-grid" id="video-grid"></div>
-          <div class="audio-mode" id="audio-mode" style="display: none;"></div>
-        `;
-        
-        // Set mode
-        setMode(currentMode);
-      }
-    }
-
-    // Jitsi Meet functions
-    function startLive() {
-      if (!isAdmin) {
-        showToast('Only admins can start live sessions');
-        return;
-      }
-      
-      const roomName = 'OpenDeSci-' + Date.now();
-      isLive = true;
-      
-      // UI updates
-      const startLiveBtn = document.getElementById('start-live-btn');
-      const endLiveBtn = document.getElementById('end-live-btn');
-      const liveBanner = document.getElementById('live-banner');
-      const joinLiveBtn = document.getElementById('join-live-btn');
-      
-      if (startLiveBtn) startLiveBtn.style.display = 'none';
-      if (endLiveBtn) endLiveBtn.style.display = 'inline-block';
-      if (liveBanner) {
-        liveBanner.style.display = 'block';
-        const livePlatform = document.getElementById('live-platform');
-        if (livePlatform) livePlatform.textContent = 'OpenDeSci Live';
-      }
-      if (joinLiveBtn) {
-        joinLiveBtn.style.display = 'inline-block';
-        joinLiveBtn.textContent = 'Join Live Session';
-      }
-      
-      // Set up live video placeholder
-      setLiveVideoPlaceholder();
-      
-      // Stop promo video
-      const promoVideo = document.getElementById('promo-video');
-      if (promoVideo) {
-        promoVideo.pause();
-        promoPlaying = false;
-      }
-      
-      // Initialize Jitsi Meet with minimal UI
-      const domain = 'meet.jit.si';
-      const options = {
-        roomName: roomName,
-        width: '100%',
-        height: '100%',
-        parentNode: document.getElementById('video-container'),
-        configOverwrite: {
-          startWithAudioMuted: true,
-          startWithVideoMuted: currentMode === 'audio',
-          enableWelcomePage: false,
-          prejoinPageEnabled: false,
-          disableDeepLinking: true,
-          enableNoisyMicDetection: false,
-          requireDisplayName: true,
-          enableClosePage: false,
-          disableModeratorIndicator: true,
-          startScreenSharing: false,
-          enableEmailInStats: false,
-          enableWelcomePage: false,
-          enableCalendarIntegration: false,
-          disableInviteFunctions: true,
-          disableRecordAudioNotification: true,
-          disableRemoteMute: false,
-          enableInsecureRoomNameWarning: false,
-          enableLayerSuspension: true,
-          enableRttStats: false,
-          enableStatsID: false,
-          enableDisplayNameInStats: false,
-          enableEmailInStats: false,
-          disableShortcuts: true,
-          disableVideoBackground: true,
-          filmStripOnly: false,
-          prejoinPageEnabled: false
-        },
-        interfaceConfigOverwrite: {
-          TOOLBAR_BUTTONS: [
-            'microphone', 'camera', 'closedcaptions', 'desktop', 'fullscreen',
-            'fodeviceselection', 'hangup', 'profile', 'chat', 'settings', 'raisehand',
-            'videoquality', 'filmstrip', 'invite', 'feedback', 'stats', 'shortcuts',
-            'tileview', 'videobackgroundblur', 'download', 'help', 'mute-everyone',
-            'security'
-          ],
-          SHOW_JITSI_WATERMARK: false,
-          SHOW_WATERMARK_FOR_GUESTS: false,
-          SHOW_BRAND_WATERMARK: false,
-          DISABLE_VIDEO_BACKGROUND: true,
-          DISABLE_FOCUS_INDICATOR: true,
-          DISABLE_DOMINANT_SPEAKER_INDICATOR: true,
-          DISABLE_PRESENCE_STATUS: true,
-          DISABLE_TRANSCRIPTION_SUBTITLES: true,
-          DISABLE_RINGING: true,
-          APP_NAME: 'OpenDeSci',
-          NATIVE_APP_NAME: 'OpenDeSci',
-          PROVIDER_NAME: 'OpenDeSci'
-        },
-        userInfo: {
-          displayName: 'Host',
-          email: ''
-        }
-      };
-
-            // Load Jitsi API if not already loaded
-      if (typeof JitsiMeetExternalAPI === 'undefined') {
-        console.error('Jitsi Meet API not loaded');
-        showToast('Error: Jitsi Meet API not loaded. Please check your internet connection.');
-        return;
-      }
-      
-      api = new JitsiMeetExternalAPI(domain, options);
-      
-      // Set up event listeners
-      api.addEventListener('participantJoined', handleParticipantJoined);
-      api.addEventListener('participantLeft', handleParticipantLeft);
-      api.addEventListener('raiseHandUpdated', handleRaiseHandUpdated);
-      api.addEventListener('videoConferenceJoined', handleConferenceJoined);
-      api.addEventListener('videoConferenceLeft', handleConferenceLeft);
-      
-      // Execute commands to hide Jitsi UI elements
-      setTimeout(() => {
-        if (api) {
-          api.executeCommand('toggleFilmStrip');
-          api.executeCommand('toggleChat');
-          api.executeCommand('toggleSettings');
-        }
-      }, 2000);
-    }
-
-    function joinLiveMeeting() {
-      if (api) {
-        // Instead of opening a new tab, focus on the current meeting
-        showToast('You are already in the meeting');
-      } else {
-        showToast('No live meeting is currently active');
-      }
-    }
-
-    function endLive() {
-      if (api) {
-        api.dispose();
-        api = null;
-      }
-      
-      isLive = false;
-      
-      // Reset UI
-      const startLiveBtn = document.getElementById('start-live-btn');
-      const endLiveBtn = document.getElementById('end-live-btn');
-      const liveBanner = document.getElementById('live-banner');
-      const joinLiveBtn = document.getElementById('join-live-btn');
-      
-      if (startLiveBtn) startLiveBtn.style.display = 'inline-block';
-      if (endLiveBtn) endLiveBtn.style.display = 'none';
-      if (liveBanner) liveBanner.style.display = 'none';
-      if (joinLiveBtn) joinLiveBtn.style.display = 'none';
-      
-      participants = [];
-      micRequests = [];
-      updateParticipantsList();
-      updateMicRequestsList();
-      
-      // Return to default video
-      setDefaultVideoPlaceholder();
-    }
-
-    // Participant management
-    function handleParticipantJoined(event) {
-      const participant = {
-        id: event.id,
-        displayName: event.displayName || 'Participant',
-        role: 'listener'
-      };
-      
-      // Check if participant already exists
-      if (!participants.find(p => p.id === participant.id)) {
-        participants.push(participant);
-        updateParticipantsList();
-        renderVideoGrid();
-        renderAudioMode();
-      }
-    }
-
-    function handleParticipantLeft(event) {
-      participants = participants.filter(p => p.id !== event.id);
-      updateParticipantsList();
-      renderVideoGrid();
-      renderAudioMode();
-      
-      // Remove any mic requests from this participant
-      micRequests = micRequests.filter(r => r.participantId !== event.id);
-      updateMicRequestsList();
-    }
-
-    function handleRaiseHandUpdated(event) {
-      if (event.raisedHand) {
-        // Add to mic requests if not already there
-        const participant = participants.find(p => p.id === event.participantId);
-        if (participant && !micRequests.find(r => r.participantId === event.participantId)) {
-          micRequests.push({
-            participantId: event.participantId,
-            displayName: participant.displayName
-          });
-          updateMicRequestsList();
-        }
-      } else {
-        // Remove from mic requests
-        micRequests = micRequests.filter(r => r.participantId !== event.participantId);
-        updateMicRequestsList();
-      }
-    }
-
-    function handleConferenceJoined(event) {
-      console.log('Conference joined successfully');
-      showToast('Live session started successfully');
-    }
-
-    function handleConferenceLeft(event) {
-      if (event.reason === 'clicked hangup') {
-        endLive();
-      }
-    }
-
-    // Render video grid
-    function renderVideoGrid() {
-      const videoGrid = document.getElementById('video-grid');
-      if (!videoGrid) return;
-      
-      videoGrid.innerHTML = '';
-      
-      // Add host first
-      const host = { id: 'host', displayName: 'Host', role: 'host' };
-      
-      // Add all participants
-      const allParticipants = [host, ...participants];
-      
-      // Limit to 16 participants for 4x4 grid
-      const participantsToShow = allParticipants.slice(0, 16);
-      
-      participantsToShow.forEach(participant => {
-        const videoItem = document.createElement('div');
-        videoItem.className = 'video-item';
-        videoItem.innerHTML = `
-          <div style="width:100%; height:100%; background:#3498db; display:flex; align-items:center; justify-content:center; color:white; font-weight:bold;">
-            ${participant.displayName.charAt(0)}
-          </div>
-          <div class="name-overlay">${participant.displayName}</div>
-        `;
-        videoGrid.appendChild(videoItem);
-      });
-    }
-
-    // Render audio mode
-    function renderAudioMode() {
-      const audioMode = document.getElementById('audio-mode');
-      if (!audioMode) return;
-      
-      audioMode.innerHTML = '';
-      
-      // Add host
-      const hostCard = document.createElement('div');
-      hostCard.className = 'participant-card host';
-      hostCard.innerHTML = `
-        <div class="avatar">H</div>
-        <h4>Host</h4>
-        <p>Host</p>
-      `;
-      audioMode.appendChild(hostCard);
-      
-      // Add speakers
-      participants.filter(p => p.role === 'speaker').forEach(participant => {
-        const speakerCard = document.createElement('div');
-        speakerCard.className = 'participant-card speaker';
-        speakerCard.innerHTML = `
-          <div class="avatar">${participant.displayName.charAt(0)}</div>
-          <h4>${participant.displayName}</h4>
-          <p>Speaker</p>
-        `;
-        audioMode.appendChild(speakerCard);
-      });
-      
-      // Add listeners
-      participants.filter(p => p.role === 'listener').forEach(participant => {
-        const listenerCard = document.createElement('div');
-        listenerCard.className = 'participant-card';
-        listenerCard.innerHTML = `
-          <div class="avatar">${participant.displayName.charAt(0)}</div>
-          <h4>${participant.displayName}</h4>
-          <p>Listener</p>
-        `;
-        audioMode.appendChild(listenerCard);
-      });
-    }
-
-    function updateParticipantsList() {
-      const participantsContainer = document.getElementById('participants');
-      if (!participantsContainer) return;
-      
-      participantsContainer.innerHTML = '';
-      
-      if (participants.length === 0) {
-        participantsContainer.innerHTML = '<p>No participants</p>';
-        return;
-      }
-      
-      participants.forEach(participant => {
-        const participantEl = document.createElement('div');
-        participantEl.className = 'participant-item';
-        participantEl.innerHTML = `
-          <span>${participant.displayName} (${participant.role})</span>
-          <div>
-            <button class="btn-mute" onclick="muteParticipant('${participant.id}')">Mute</button>
-            <button class="btn-remove" onclick="kickParticipant('${participant.id}')">Remove</button>
-            ${participant.role === 'listener' ? 
-              `<button class="btn-approve" onclick="promoteToSpeaker('${participant.id}')">Promote</button>` : 
-              `<button class="btn-reject" onclick="demoteToListener('${participant.id}')">Demote</button>`
-            }
-          </div>
-        `;
-        participantsContainer.appendChild(participantEl);
-      });
-    }
-
-    function updateMicRequestsList() {
-      const micRequestsContainer = document.getElementById('mic-requests');
-      if (!micRequestsContainer) return;
-      
-      micRequestsContainer.innerHTML = '';
-      
-      if (micRequests.length === 0) {
-        micRequestsContainer.innerHTML = '<p>No mic requests</p>';
-        return;
-      }
-      
-      micRequests.forEach(request => {
-        const requestEl = document.createElement('div');
-        requestEl.className = 'mic-request-item';
-        requestEl.innerHTML = `
-          <span>${request.displayName} wants to speak</span>
-          <div>
-            <button class="btn-approve" onclick="approveMicRequest('${request.participantId}')">Approve</button>
-            <button class="btn-reject" onclick="rejectMicRequest('${request.participantId}')">Reject</button>
-          </div>
-        `;
-        micRequestsContainer.appendChild(requestEl);
-      });
-    }
-
-    // Admin control functions
-    function muteAll() {
-      if (!api) return;
-      
-      participants.forEach(participant => {
-        api.executeCommand('muteParticipant', participant.id);
-      });
-      showToast('All participants muted');
-    }
-
-    function muteParticipant(participantId) {
-      if (!api) return;
-      api.executeCommand('muteParticipant', participantId);
-      showToast('Participant muted');
-    }
-
-    function kickParticipant(participantId) {
-      if (!api) return;
-      api.executeCommand('kickParticipant', participantId);
-      showToast('Participant removed');
-    }
-
-    function promoteToSpeaker(participantId) {
-      const participant = participants.find(p => p.id === participantId);
-      if (participant) {
-        participant.role = 'speaker';
-        updateParticipantsList();
-        renderAudioMode();
-        showToast('Participant promoted to speaker');
-      }
-    }
-
-    function demoteToListener(participantId) {
-      const participant = participants.find(p => p.id === participantId);
-      if (participant) {
-        participant.role = 'listener';
-        updateParticipantsList();
-        renderAudioMode();
-        showToast('Participant demoted to listener');
-      }
-    }
-
-    function approveMicRequest(participantId) {
-      if (!api) return;
-      
-      // Unmute the participant
-      api.executeCommand('muteParticipant', participantId, false);
-      
-      // Promote to speaker
-      promoteToSpeaker(participantId);
-      
-      // Remove from mic requests
-      micRequests = micRequests.filter(r => r.participantId !== participantId);
-      updateMicRequestsList();
-      showToast('Mic request approved');
-    }
-
-    function rejectMicRequest(participantId) {
-      // Just remove from mic requests
-      micRequests = micRequests.filter(r => r.participantId !== participantId);
-      updateMicRequestsList();
-      showToast('Mic request rejected');
-    }
-
-    // Schedule functions
-    function scheduleLive() {
-      document.getElementById('schedule-modal').style.display = 'flex';
-    }
-
-    function saveEvent() {
-      const titleInput = document.getElementById('event-title');
-      const timeInput = document.getElementById('event-time');
-      const typeInput = document.getElementById('event-type');
-      const descriptionInput = document.getElementById('event-description');
-      
-      if (!titleInput || !timeInput || !typeInput) return;
-      
-      const title = titleInput.value;
-      const time = timeInput.value;
-      const type = typeInput.value;
-      const description = descriptionInput ? descriptionInput.value : '';
-      
-      if (!title || !time) {
-        alert('Please fill in title and time');
-        return;
-      }
-
-      try {
-        // Create event object
-        const event = {
-          id: 'event-' + Date.now(),
-          title,
-          time,
-          type,
-          description,
-          createdAt: new Date().toISOString()
+        const firebaseConfig = {
+            apiKey: "AIzaSyCie4lyWxHhnfaRZnKZI4crWHQQ18EjVVo",
+            authDomain: "opendesci-community.firebaseapp.com",
+            projectId: "opendesci-community",
+            storageBucket: "opendesci-community.firebasestorage.app",
+            messagingSenderId: "175060392409",
+            appId: "1:175060392409:web:d86e37965cefc1961f21c8",
+            measurementId: "G-NPY0HT1R1N"
         };
-        
-        // Add to events array
-        eventsData.push(event);
-        
-        // Save to localStorage
-        localStorage.setItem('communityEvents', JSON.stringify(eventsData));
-        
-        alert('Event scheduled successfully!');
-        closeModal('schedule-modal');
-        
-        // Clear form
-        titleInput.value = '';
-        timeInput.value = '';
-        if (descriptionInput) descriptionInput.value = '';
-        
-        // Refresh events list
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+
+        let currentUser = null;
+        let isAdmin = false;
+        let jitsiApi = null;
+        let currentSessionId = null;
+        let sessionMode = 'video';
+        let isJoined = false;
+        let isMinimized = false;
+        let hideListeners = false;
+        let promoVideo = document.getElementById('promo-video');
+
+        // Toast function
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 3000);
+        }
+
+        // Auth state listener
+        auth.onAuthStateChanged(async user => {
+            currentUser = user;
+            if (user) {
+                document.getElementById('auth-modal').style.display = 'none';
+                document.getElementById('admin-btn').style.display = 'block';
+                // Check if admin
+                const adminDoc = await db.collection('admins').doc(user.uid).get();
+                isAdmin = adminDoc.exists;
+                // Check profile
+                const profileDoc = await db.collection('profiles').doc(user.uid).get();
+                if (!profileDoc.exists || !profileDoc.data().username) {
+                    document.getElementById('profile-modal').style.display = 'flex';
+                }
+                // Load promo
+                loadPromo();
+                // Listen for sessions
+                listenForSessions();
+            } else {
+                document.getElementById('auth-modal').style.display = 'flex';
+                document.getElementById('admin-btn').style.display = 'none';
+                document.getElementById('admin-panel').style.display = 'none';
+            }
+        });
+
+
+              // Login
+        document.getElementById('login-btn').addEventListener('click', () => {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            auth.signInWithEmailAndPassword(email, password).catch(err => showToast(err.message));
+        });
+
+        // Register
+        document.getElementById('register-btn').addEventListener('click', () => {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            auth.createUserWithEmailAndPassword(email, password).catch(err => showToast(err.message));
+        });
+
+        // Save Profile
+        document.getElementById('save-profile-btn').addEventListener('click', async () => {
+            const username = document.getElementById('username').value;
+            const bio = document.getElementById('bio').value;
+            const file = document.getElementById('avatar-upload').files[0];
+
+            // Check unique username
+            const usernameQuery = await db.collection('profiles').where('username', '==', username).get();
+            if (!usernameQuery.empty) {
+                showToast('Username taken');
+                return;
+            }
+
+            let avatarUrl = '';
+            if (file) {
+                const ref = storage.ref(`profiles/${currentUser.uid}/avatar.jpg`);
+                await ref.put(file);
+                avatarUrl = await ref.getDownloadURL();
+            }
+
+            await db.collection('profiles').doc(currentUser.uid).set({
+                username,
+                bio,
+                avatarUrl,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            document.getElementById('profile-modal').style.display = 'none';
+        });
+
+        // Load Promo
+        async function loadPromo() {
+            const promoDoc = await db.doc('settings/promo').get();
+            if (promoDoc.exists) {
+                promoVideo.src = promoDoc.data().url;
+                promoVideo.play();
+            }
+        }
+
+        // Listen for active sessions
+        function listenForSessions() {
+            db.collection('sessions').where('status', '==', 'active').onSnapshot(snapshot => {
+                if (snapshot.empty) {
+                    // No live, show promo
+                    promoVideo.style.display = 'block';
+                    document.getElementById('jitsi-container').innerHTML = '';
+                    document.getElementById('join-live-btn').style.display = 'none';
+                    document.getElementById('open-space-ui').style.display = 'none';
+                    if (jitsiApi) jitsiApi.dispose();
+                    currentSessionId = null;
+                } else {
+                    // Assume first active session
+                    const session = snapshot.docs[0];
+                    currentSessionId = session.id;
+                    const data = session.data();
+                    sessionMode = data.mode;
+                    promoVideo.style.display = 'none';
+                    document.getElementById('join-live-btn').style.display = 'block';
+                    if (data.mode === 'audio') {
+                        document.getElementById('open-space-ui').style.display = 'flex';
+                    }
+                    // Listen for participants and overlays
+                    listenForParticipants();
+                }
+            });
+        }
+
+        // Join Live
+        document.getElementById('join-live-btn').addEventListener('click', async () => {
+            if (!currentSessionId) return;
+            const sessionDoc = await db.collection('sessions').doc(currentSessionId).get();
+            const data = sessionDoc.data();
+            if (!data.public) {
+                if (!data.invites || !data.invites.includes(currentUser.uid)) {
+                    showToast('You are not invited to this private session');
+                    return;
+                }
+            }
+
+            // Join
+            isJoined = true;
+            const profile = await db.collection('profiles').doc(currentUser.uid).get();
+            const username = profile.data().username;
+
+            const domain = 'meet.jit.si';
+            const options = {
+                roomName: data.room,
+                width: '100%',
+                height: '100%',
+                parentNode: document.getElementById('jitsi-container'),
+                userInfo: {
+                    displayName: username
+                },
+                configOverwrite: {
+                    prejoinPageEnabled: false,
+                    disableDeepLinking: true,
+                    startWithAudioMuted: true, // Initial mute
+                    startWithVideoMuted: sessionMode === 'audio',
+                },
+                interfaceConfigOverwrite: {
+                    SHOW_JITSI_WATERMARK: false,
+                    SHOW_WATERMARK_FOR_GUESTS: false,
+                    MOBILE_APP_PROMO: false,
+                    // Hide toolbar for custom UI in audio
+                    TOOLBAR_BUTTONS: sessionMode === 'audio' ? [] : undefined,
+                }
+            };
+            jitsiApi = new JitsiMeetExternalAPI(domain, options);
+
+            // Set role-based config
+            const participantDoc = await db.collection('sessions').doc(currentSessionId).collection('participants').doc(currentUser.uid).get();
+            let role = 'listener';
+            if (participantDoc.exists) {
+                role = participantDoc.data().role;
+            } else {
+                // Add participant
+                await db.collection('sessions').doc(currentSessionId).collection('participants').doc(currentUser.uid).set({
+                    role: 'listener',
+                    joined: true,
+                    requestedMic: false
+                });
+            }
+            if (role === 'speaker') {
+                jitsiApi.executeCommand('toggleAudio');
+                if (sessionMode === 'video') jitsiApi.executeCommand('toggleVideo');
+            }
+
+            // Events
+            jitsiApi.on('readyToClose', () => {
+                leaveSession();
+            });
+            window.addEventListener('beforeunload', leaveSession);
+
+            // For audio mode, hide video
+            if (sessionMode === 'audio') {
+                document.getElementById('jitsi-container').style.display = 'none'; // Offscreen audio
+            }
+
+            // Mark joined
+            await db.collection('sessions').doc(currentSessionId).collection('participants').doc(currentUser.uid).update({ joined: true });
+
+            document.getElementById('join-live-btn').style.display = 'none';
+        });
+
+        async function leaveSession() {
+            if (currentSessionId) {
+                await db.collection('sessions').doc(currentSessionId).collection('participants').doc(currentUser.uid).update({ joined: false });
+            }
+            if (jitsiApi) jitsiApi.dispose();
+            isJoined = false;
+        }
+
+        // Listen for participants
+        function listenForParticipants() {
+            if (!currentSessionId) return;
+            db.collection('sessions').doc(currentSessionId).collection('participants').onSnapshot(async snapshot => {
+                const speakers = [];
+                const listeners = [];
+                for (const doc of snapshot.docs) {
+                    if (doc.data().joined) {
+                        const profile = await db.collection('profiles').doc(doc.id).get();
+                        const userData = { ...profile.data(), role: doc.data().role };
+                        if (userData.role === 'speaker' || userData.role === 'host') {
+                            speakers.push(userData);
+                        } else {
+                            listeners.push(userData);
+                        }
+                    }
+                }
+                // Update overlays
+                updateOverlay('speakers-overlay', speakers.slice(0, 3));
+                updateOverlay('listeners-overlay', listeners.slice(0, 3));
+
+                // Update Open Space UI
+                if (sessionMode === 'audio') {
+                    updateOpenSpaceUI(speakers, listeners);
+                }
+
+                // If user is listener, show request mic
+                const myRole = snapshot.docs.find(d => d.id === currentUser.uid)?.data().role;
+                document.getElementById('request-mic-btn').style.display = myRole === 'listener' ? 'block' : 'none';
+            });
+        }
+
+        function updateOverlay(id, users) {
+            const container = document.getElementById(id);
+            container.innerHTML = '';
+            users.forEach(user => {
+                const chip = document.createElement('div');
+                chip.className = 'joiner-chip';
+                const avatar = document.createElement('img');
+                avatar.className = 'joiner-avatar';
+                avatar.src = user.avatarUrl || 'default-avatar.jpg';
+                const name = document.createElement('span');
+                name.textContent = user.username;
+                chip.appendChild(avatar);
+                chip.appendChild(name);
+                container.appendChild(chip);
+            });
+        }
+
+        function updateOpenSpaceUI(speakers, listeners) {
+            const list = document.getElementById('participants-list');
+            list.innerHTML = '';
+            [...speakers, ... (hideListeners ? [] : listeners)].forEach(user => {
+                const card = document.createElement('div');
+                card.className = 'participant-card';
+                const avatar = document.createElement('img');
+                avatar.className = 'participant-avatar';
+                avatar.src = user.avatarUrl || 'default-avatar.jpg';
+                const name = document.createElement('div');
+                name.textContent = user.username;
+                const role = document.createElement('div');
+                role.className = `role-${user.role}`;
+                role.textContent = user.role.charAt(0).toUpperCase() + user.role.slice(1);
+                card.appendChild(avatar);
+                card.appendChild(name);
+                card.appendChild(role);
+                list.appendChild(card);
+            });
+        }
+
+        // Request Mic
+        document.getElementById('request-mic-btn').addEventListener('click', async () => {
+            if (currentSessionId) {
+                await db.collection('sessions').doc(currentSessionId).collection('participants').doc(currentUser.uid).update({ requestedMic: true });
+                showToast('Mic request sent');
+            }
+        });
+
+        // Reactions
+        document.querySelectorAll('.reaction-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                if (currentSessionId) {
+                    const emoji = btn.dataset.emoji;
+                    await db.collection('sessions').doc(currentSessionId).collection('reactions').add({
+                        uid: currentUser.uid,
+                        emoji,
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }
+            });
+        });
+
+        // Listen for reactions
+        function listenForReactions() {
+            if (!currentSessionId) return;
+            db.collection('sessions').doc(currentSessionId).collection('reactions').onSnapshot(snapshot => {
+                snapshot.docChanges().forEach(change => {
+                    if (change.type === 'added') {
+                        // Show floating emoji animation
+                        const data = change.doc.data();
+                        const floating = document.createElement('div');
+                        floating.textContent = data.emoji;
+                        floating.style.position = 'absolute';
+                        floating.style.fontSize = '30px';
+                        floating.style.animation = 'float 2s ease-out';
+                        floating.style.left = Math.random() * 100 + '%';
+                        floating.style.bottom = '0';
+                        document.getElementById('hero').appendChild(floating);
+                        setTimeout(() => floating.remove(), 2000);
+                    }
+                });
+            });
+        }
+        // Add @keyframes for float
+        const style = document.createElement('style');
+        style.textContent = '@keyframes float { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-200px); opacity: 0; } }';
+        document.head.appendChild(style);
+
+        // Hide Listeners
+        document.getElementById('hide-listeners-btn').addEventListener('click', () => {
+            hideListeners = !hideListeners;
+            listenForParticipants(); // Refresh UI
+        });
+
+        // Minimize
+        document.getElementById('minimize-btn').addEventListener('click', () => {
+            isMinimized = true;
+            document.getElementById('open-space-ui').style.display = 'none';
+            document.getElementById('minimized-bar').style.display = 'block';
+        });
+
+        document.getElementById('restore-btn').addEventListener('click', () => {
+            isMinimized = false;
+            document.getElementById('open-space-ui').style.display = 'flex';
+            document.getElementById('minimized-bar').style.display = 'none';
+        });
+      // Events Carousel
+        async function loadEvents() {
+            const events = await db.collection('events').get();
+            const carousel = document.getElementById('events-carousel');
+            carousel.innerHTML = '';
+            // Group into Live, Hosted, Upcoming
+            const now = new Date();
+            const live = events.docs.filter(d => new Date(d.data().date) <= now && d.data().status === 'live');
+            const upcoming = events.docs.filter(d => new Date(d.data().date) > now);
+            const hosted = events.docs.filter(d => new Date(d.data().date) < now && d.data().status !== 'live');
+            // Create cards
+            const liveCard = createEventCardGroup('Live Events', live);
+            const hostedCard = createEventCardGroup('Hosted Calls', hosted);
+            const upcomingCard = createEventCardGroup('Upcoming Events', upcoming);
+            carousel.appendChild(liveCard);
+            carousel.appendChild(hostedCard);
+            carousel.appendChild(upcomingCard);
+            // Animate
+            setInterval(() => {
+                const first = carousel.firstChild;
+                carousel.appendChild(first);
+            }, 4000);
+            // Swipe
+            let startX = 0;
+            carousel.addEventListener('touchstart', e => startX = e.touches[0].clientX);
+            carousel.addEventListener('touchend', e => {
+                const endX = e.changedTouches[0].clientX;
+                if (startX - endX > 50) {
+                    // Swipe left
+                    const first = carousel.firstChild;
+                    carousel.appendChild(first);
+                } else if (endX - startX > 50) {
+                    // Swipe right
+                    const last = carousel.lastChild;
+                    carousel.insertBefore(last, carousel.firstChild);
+                }
+            });
+        }
+
+        function createEventCardGroup(title, events) {
+            const card = document.createElement('div');
+            card.className = 'event-card';
+            const h3 = document.createElement('h3');
+            h3.textContent = title;
+            card.appendChild(h3);
+            events.forEach(event => {
+                const p = document.createElement('p');
+                p.textContent = `${event.data().title} - ${event.data().date}`;
+                card.appendChild(p);
+            });
+            return card;
+        }
         loadEvents();
-        
-      } catch (error) {
-        alert('Error saving event: ' + error.message);
-        console.error('Save error:', error);
-      }
-    }
 
-    function loadEvents() {
-      try {
-        // Load from localStorage
-        const storedEvents = localStorage.getItem('communityEvents');
-        if (storedEvents) {
-          eventsData = JSON.parse(storedEvents);
+        // Admin Panel Toggle
+        document.getElementById('admin-btn').addEventListener('click', () => {
+            const panel = document.getElementById('admin-panel');
+            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+            if (!isAdmin) {
+                panel.innerHTML = '<h2>You are not an admin</h2>';
+                return;
+            }
+            // Load admin data
+            loadAdminParticipants();
+            loadAdminEvents();
+            loadInvites();
+        });
+
+        // Toggle cards
+        document.querySelectorAll('.toggle-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const target = document.getElementById(btn.dataset.target);
+                target.style.display = target.style.display === 'none' ? 'block' : 'none';
+            });
+        });
+
+        // Start Live
+        document.getElementById('start-live-btn').addEventListener('click', async () => {
+            const mode = document.getElementById('mode-select').value;
+            const isPublic = document.getElementById('public-private-select').value === 'public';
+            const room = `room-${Date.now()}`;
+            await db.collection('sessions').add({
+                room,
+                mode,
+                status: 'active',
+                public: isPublic,
+                invites: []
+            });
+            showToast('Live started');
+        });
+
+        // End Live
+        document.getElementById('end-live-btn').addEventListener('click', async () => {
+            if (currentSessionId) {
+                await db.collection('sessions').doc(currentSessionId).update({ status: 'ended' });
+                showToast('Live ended');
+            }
+        });
+
+        // Restart
+        document.getElementById('restart-live-btn').addEventListener('click', async () => {
+            if (currentSessionId) {
+                await db.collection('sessions').doc(currentSessionId).update({ status: 'ended' });
+            }
+            // Start new
+            document.getElementById('start-live-btn').click();
+        });
+
+        // Save Promo
+        document.getElementById('save-promo-btn').addEventListener('click', async () => {
+            const url = document.getElementById('promo-url-input').value;
+            await db.doc('settings/promo').set({ url });
+            loadPromo();
+            showToast('Promo updated');
+        });
+
+        // Pause Promo (admin only)
+        document.getElementById('pause-promo-btn').addEventListener('click', () => {
+            if (promoVideo.paused) {
+                promoVideo.play();
+            } else {
+                promoVideo.pause();
+            }
+        });
+
+        // Start Broadcast
+        document.getElementById('start-broadcast-btn').addEventListener('click', () => {
+            const rtmp = document.getElementById('rtmp-url-input').value;
+            const key = document.getElementById('stream-key-input').value;
+            if (jitsiApi) {
+                // Assuming self-hosted for RTMP, may not work on meet.jit.si
+                jitsiApi.executeCommand('startRecording', {
+                    mode: 'stream',
+                    rtmpStreamKey: `${rtmp}/${key}` // Format may vary
+                });
+                showToast('Broadcast started (requires backend config)');
+            }
+        });
+
+        // Public/Private change
+        document.getElementById('public-private-select').addEventListener('change', async (e) => {
+            const isPublic = e.target.value === 'public';
+            document.getElementById('invites-section').style.display = isPublic ? 'none' : 'block';
+            if (currentSessionId) {
+                await db.collection('sessions').doc(currentSessionId).update({ public: isPublic });
+            }
+        });
+
+        // Add Invite
+        document.getElementById('add-invite-btn').addEventListener('click', async () => {
+            const uid = document.getElementById('invite-user-input').value;
+            if (currentSessionId) {
+                await db.collection('sessions').doc(currentSessionId).update({
+                    invites: firebase.firestore.FieldValue.arrayUnion(uid)
+                });
+                loadInvites();
+            }
+        });
+
+        async function loadInvites() {
+            if (currentSessionId) {
+                const session = await db.collection('sessions').doc(currentSessionId).get();
+                const invites = session.data().invites || [];
+                const list = document.getElementById('invites-list');
+                list.innerHTML = '';
+                invites.forEach(async uid => {
+                    const profile = await db.collection('profiles').doc(uid).get();
+                    const div = document.createElement('div');
+                    div.textContent = profile.data().username;
+                    const removeBtn = document.createElement('button');
+                    removeBtn.textContent = 'Remove';
+                    removeBtn.addEventListener('click', async () => {
+                        await db.collection('sessions').doc(currentSessionId).update({
+                            invites: firebase.firestore.FieldValue.arrayRemove(uid)
+                        });
+                        loadInvites();
+                    });
+                    div.appendChild(removeBtn);
+                    list.appendChild(div);
+                });
+            }
         }
-        
-        // Update UI
-        renderEvents();
-        renderEventManagement();
-        
-      } catch (error) {
-        console.error('Error loading events:', error);
-      }
-    }
 
-    function renderEvents() {
-      const upcomingContainer = document.getElementById('upcoming-events-container');
-      const pastContainer = document.getElementById('past-events-container');
-      
-      if (!upcomingContainer || !pastContainer) return;
-      
-      upcomingContainer.innerHTML = '';
-      pastContainer.innerHTML = '';
-      
-      const now = new Date();
-      
-      eventsData.forEach(event => {
-        const eventDate = new Date(event.time);
-        
-        const eventHTML = `
-          <div class="event-card">
-            <h3>${event.title}</h3>
-            <p class="event-date">${eventDate.toLocaleString()}</p>
-            <p>Type: ${event.type}</p>
-            <p>${event.description || 'No description'}</p>
-            <div class="countdown" id="countdown-${event.id}"></div>
-          </div>
-        `;
-        
-        if (eventDate > now) {
-          upcomingContainer.innerHTML += eventHTML;
-          
-          // Set up countdown timer
-          setTimeout(() => {
-            setupCountdown(event.id, eventDate);
-          }, 100);
-        } else {
-          pastContainer.innerHTML += eventHTML;
+        // Load Admin Participants
+        function loadAdminParticipants() {
+            if (!currentSessionId) return;
+            db.collection('sessions').doc(currentSessionId).collection('participants').onSnapshot(snapshot => {
+                const list = document.getElementById('participants-list-admin');
+                list.innerHTML = '';
+                const requests = document.getElementById('mic-requests');
+                requests.innerHTML = '';
+                snapshot.docs.forEach(doc => {
+                    const data = doc.data();
+                    const div = document.createElement('div');
+                    div.textContent = `User: ${doc.id}, Role: ${data.role}`;
+                    const promoteBtn = document.createElement('button');
+                    promoteBtn.textContent = 'Promote to Speaker';
+                    promoteBtn.addEventListener('click', () => {
+                        doc.ref.update({ role: 'speaker', requestedMic: false });
+                    });
+                    const muteBtn = document.createElement('button');
+                    muteBtn.textContent = 'Mute';
+                    muteBtn.addEventListener('click', () => {
+                        // Use Jitsi to mute if possible
+                        // For now, set flag
+                        doc.ref.update({ muted: true });
+                        // Client listens and mutes
+                    });
+                    div.appendChild(promoteBtn);
+                    div.appendChild(muteBtn);
+                    list.appendChild(div);
+
+                    if (data.requestedMic) {
+                        const reqDiv = document.createElement('div');
+                        reqDiv.textContent = `Mic request from ${doc.id}`;
+                        const approve = document.createElement('button');
+                        approve.textContent = 'Approve';
+                        approve.addEventListener('click', () => {
+                            doc.ref.update({ role: 'speaker', requestedMic: false });
+                        });
+                        const deny = document.createElement('button');
+                        deny.textContent = 'Deny';
+                        deny.addEventListener('click', () => {
+                            doc.ref.update({ requestedMic: false });
+                        });
+                        reqDiv.appendChild(approve);
+                        reqDiv.appendChild(deny);
+                        requests.appendChild(reqDiv);
+                    }
+                });
+            });
         }
-      });
-    }
 
-    function renderEventManagement() {
-      const eventManagement = document.getElementById('event-management');
-      if (!eventManagement) return;
-      
-      eventManagement.innerHTML = '';
-      
-      if (eventsData.length === 0) {
-        eventManagement.innerHTML = '<p>No events scheduled</p>';
-        return;
-      }
-      
-      const now = new Date();
-      
-      eventsData.forEach(event => {
-        const eventDate = new Date(event.time);
-        const eventEl = document.createElement('div');
-        eventEl.className = 'event-item';
-        eventEl.innerHTML = `
-          <span>${event.title} (${eventDate.toLocaleString()})</span>
-          <div>
-            <button class="btn-edit" onclick="editEvent('${event.id}')">Edit</button>
-            <button class="btn-delete" onclick="deleteEvent('${event.id}')">Delete</button>
-          </div>
-        `;
-        eventManagement.appendChild(eventEl);
-      });
-    }
+        // Create Event
+        document.getElementById('create-event-btn').addEventListener('click', async () => {
+            const title = document.getElementById('event-title').value;
+            const date = document.getElementById('event-date').value;
+            const desc = document.getElementById('event-desc').value;
+            await db.collection('events').add({
+                title,
+                date,
+                description: desc,
+                status: 'upcoming'
+            });
+            loadEvents();
+            loadAdminEvents();
+            showToast('Event created');
+        });
 
-    function editEvent(eventId) {
-      const event = eventsData.find(e => e.id === eventId);
-      if (!event) return;
-      
-      document.getElementById('edit-id').value = event.id;
-      document.getElementById('edit-title').value = event.title;
-      document.getElementById('edit-time').value = event.time.replace(' ', 'T');
-      document.getElementById('edit-type').value = event.type;
-      document.getElementById('edit-description').value = event.description || '';
-      
-      document.getElementById('edit-modal').style.display = 'flex';
-    }
-
-    function updateEvent() {
-      const id = document.getElementById('edit-id').value;
-      const title = document.getElementById('edit-title').value;
-      const time = document.getElementById('edit-time').value;
-      const type = document.getElementById('edit-type').value;
-      const description = document.getElementById('edit-description').value;
-      
-      if (!title || !time) {
-        alert('Please fill in title and time');
-        return;
-      }
-      
-      const eventIndex = eventsData.findIndex(e => e.id === id);
-      if (eventIndex === -1) return;
-      
-      eventsData[eventIndex] = {
-        ...eventsData[eventIndex],
-        title,
-        time,
-        type,
-        description
-      };
-      
-      // Save to localStorage
-      localStorage.setItem('communityEvents', JSON.stringify(eventsData));
-      
-      closeModal('edit-modal');
-      loadEvents();
-      showToast('Event updated successfully');
-    }
-
-    function deleteEvent(eventId) {
-      if (!confirm('Are you sure you want to delete this event?')) return;
-      
-      eventsData = eventsData.filter(e => e.id !== eventId);
-                           
-    // Save to localStorage
-      localStorage.setItem('communityEvents', JSON.stringify(eventsData));
-      
-      loadEvents();
-      showToast('Event deleted successfully');
-    }
-
-    function setupCountdown(id, eventDate) {
-      const countdownElement = document.getElementById(`countdown-${id}`);
-      if (!countdownElement) return;
-      
-      const countdownInterval = setInterval(() => {
-        const now = new Date();
-        const distance = eventDate - now;
-        
-        if (distance < 0) {
-          clearInterval(countdownInterval);
-          countdownElement.innerHTML = 'Event started!';
-          return;
+        // Load Admin Events
+        async function loadAdminEvents() {
+            const events = await db.collection('events').get();
+            const list = document.getElementById('events-list-admin');
+            list.innerHTML = '';
+            events.docs.forEach(doc => {
+                const div = document.createElement('div');
+                div.textContent = `${doc.data().title} - ${doc.data().date}`;
+                const editBtn = document.createElement('button');
+                editBtn.textContent = 'Edit';
+                editBtn.addEventListener('click', () => {
+                    // TODO: Implement edit form
+                    showToast('Edit not implemented yet');
+                });
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = 'Delete';
+                deleteBtn.addEventListener('click', async () => {
+                    await doc.ref.delete();
+                    loadEvents();
+                    loadAdminEvents();
+                });
+                div.appendChild(editBtn);
+                div.appendChild(deleteBtn);
+                list.appendChild(div);
+            });
         }
-        
-        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-        
-        countdownElement.innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
-      }, 1000);
-    }
 
-    // Enhanced showToast function
-    function showToast(message) {
-      // Create toast element if it doesn't exist
-      let toast = document.getElementById('toast');
-      if (!toast) {
-        toast = document.createElement('div');
-        toast.id = 'toast';
-        toast.style.position = 'fixed';
-        toast.style.bottom = '20px';
-        toast.style.left = '50%';
-        toast.style.transform = 'translateX(-50%)';
-        toast.style.backgroundColor = '#333';
-        toast.style.color = '#fff';
-        toast.style.padding = '10px 20px';
-        toast.style.borderRadius = '5px';
-        toast.style.zIndex = '10000';
-        toast.style.opacity = '0';
-        toast.style.transition = 'opacity 0.3s';
-        document.body.appendChild(toast);
-      }
-      
-      toast.textContent = message;
-      toast.style.opacity = '1';
-      
-      setTimeout(() => {
-        toast.style.opacity = '0';
-      }, 3000);
-    }
-  </script>
+        // Record
+        document.getElementById('record-btn').addEventListener('click', () => {
+            if (jitsiApi) {
+                jitsiApi.executeCommand('startRecording', { mode: 'file' });
+                showToast('Recording started (requires backend)');
+            }
+        });
+        if (isAdmin) document.getElementById('record-btn').style.display = 'block';
+
+        // Call listenForReactions
+        listenForReactions();
+    </script>
 </body>
 </html>
