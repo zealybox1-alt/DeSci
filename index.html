@@ -1,1016 +1,1853 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Community Hub</title>
-    <style>
-        /* Dark Theme CSS */
-        body {
-            background-color: #121212;
-            color: #ffffff;
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        /* Hero Section */
-        #hero {
-            position: relative;
-            width: 100%;
-            height: 60vh;
-        }
-        .aspect-16-9 {
-            position: relative;
-            padding-top: 56.25%; /* 16:9 Aspect Ratio */
-            background-color: #1f1f1f;
-        }
-        #promo-video, #jitsi-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        }
-        #promo-video {
-            object-fit: cover;
-        }
-        /* Overlays */
-        .overlay {
-            position: absolute;
-            z-index: 10;
-            width: 100%;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-around;
-        }
-        .overlay-top {
-            top: 10px;
-        }
-        .overlay-bottom {
-            bottom: 10px;
-        }
-        .joiner-chip {
-            background-color: rgba(31, 31, 31, 0.8);
-            border-radius: 20px;
-            padding: 5px 10px;
-            margin: 5px;
-            display: flex;
-            align-items: center;
-        }
-        .joiner-avatar {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            margin-right: 5px;
-        }
-        /* Mobile adjustments */
-        @media (max-width: 768px) {
-            .overlay-top .joiner-chip:nth-child(n+4),
-            .overlay-bottom .joiner-chip:nth-child(n+4) {
-                display: none;
-            }
-        }
-        /* Join Button */
-        #join-live-btn {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: #4caf50;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            z-index: 10;
-        }
-        /* Open Space UI */
-        #open-space-ui {
-            display: none;
-            flex-wrap: wrap;
-            justify-content: center;
-            margin-top: 20px;
-        }
-        .participant-card {
-            background-color: #1f1f1f;
-            border-radius: 10px;
-            padding: 10px;
-            margin: 10px;
-            width: 150px;
-            text-align: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
-        }
-        .participant-avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-        }
-        .role-host { color: #ff9800; }
-        .role-speaker { color: #4caf50; }
-        .role-listener { color: #9e9e9e; }
-        #reactions {
-            position: fixed;
-            bottom: 100px;
-            right: 20px;
-            z-index: 20;
-        }
-        .reaction-btn {
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            margin: 5px;
-        }
-        #hide-listeners-btn, #minimize-btn, #record-btn {
-            background-color: #333;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            margin: 5px;
-            cursor: pointer;
-        }
-        #minimized-bar {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background-color: #1f1f1f;
-            padding: 10px;
-            text-align: center;
-            z-index: 30;
-        }
-        /* Events Carousel */
-        #events-section {
-            margin-top: 40px;
-        }
-        .carousel {
-            display: flex;
-            overflow: hidden;
-            position: relative;
-        }
-        .carousel-inner {
-            display: flex;
-            transition: transform 0.5s ease;
-        }
-        .event-card {
-            background-color: #1f1f1f;
-            border-radius: 10px;
-            padding: 20px;
-            margin: 10px;
-            width: 300px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
-            flex-shrink: 0;
-        }
-        /* Admin Panel */
-        #admin-btn {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background-color: #f44336;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 50px;
-            cursor: pointer;
-            z-index: 20;
-            display: none;
-        }
-        #admin-panel {
-            display: none;
-            background-color: #1f1f1f;
-            border-radius: 10px;
-            padding: 20px;
-            margin: 20px auto;
-            max-width: 800px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-        }
-        .admin-card {
-            margin-bottom: 20px;
-        }
-        .toggle-btn {
-            background-color: #333;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            cursor: pointer;
-        }
-        /* Modals */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.7);
-            z-index: 50;
-            justify-content: center;
-            align-items: center;
-        }
-        .modal-content {
-            background-color: #1f1f1f;
-            padding: 20px;
-            border-radius: 10px;
-            width: 300px;
-            text-align: center;
-        }
-        /* Toasts */
-        .toast {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: #333;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 5px;
-            z-index: 40;
-            display: none;
-        }
-        /* Animations */
-        @keyframes slide {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-33.33%); }
-        }
-        .animating .carousel-inner {
-            animation: slide 4s infinite;
-        }
-        /* Responsive */
-        @media (max-width: 768px) {
-            .event-card {
-                width: 100%;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OpenDeSci Community Hub</title>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+  <script src="https://meet.jit.si/external_api.js"></script>
+  <style>
+    :root {
+      --primary: #3498db;
+      --primary-dark: #2980b9;
+      --secondary: #2c3e50;
+      --accent: #e74c3c;
+      --accent-dark: #c0392b;
+      --success: #2ecc71;
+      --warning: #f39c12;
+      --dark-bg: #121212;
+      --dark-card: #1e1e1e;
+      --dark-border: #333;
+      --text-primary: #f5f5f5;
+      --text-secondary: #b3b3b3;
+    }
+    
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--dark-bg);
+      color: var(--text-primary);
+      padding-bottom: 80px;
+    }
+    
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 20px;
+      background: var(--secondary);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    header h1 { 
+      margin: 0; 
+      font-size: 1.5rem; 
+      font-weight: 700;
+    }
+    
+    #authBtn {
+      background: var(--accent);
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      color: white;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    #authBtn:hover {
+      background: var(--accent-dark);
+    }
+
+    #authBtn img {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    /* Hero Section */
+    .hero {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: black;
+      margin-bottom: 20px;
+    }
+    
+    .hero video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .watermark {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      font-size: 0.9rem;
+      padding: 6px 10px;
+      border-radius: 6px;
+      z-index: 5;
+    }
+    
+    .join-btn-container {
+      position: absolute;
+      bottom: 20px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: center;
+      z-index: 5;
+    }
+    
+    .join-btn {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 30px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s;
+      z-index: 5;
+    }
+    
+    .join-btn:hover {
+      background: var(--accent-dark);
+      transform: translateY(-2px);
+    }
+
+    /* Video Overlay Participants */
+    .participant-overlay {
+      position: absolute;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      padding: 10px;
+      z-index: 5;
+      pointer-events: none;
+      width: 100%;
+    }
+    
+    .top-overlay {
+      top: 50px;
+    }
+    
+    .bottom-overlay {
+      bottom: 70px;
+    }
+    
+    .participant-chip {
+      background: rgba(0, 0, 0, 0.7);
+      border-radius: 20px;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: white;
+      font-size: 14px;
+      max-width: 160px;
+      pointer-events: auto;
+    }
+    
+    .participant-avatar {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    
+    .participant-role {
+      font-size: 10px;
+      opacity: 0.8;
+      margin-left: auto;
+    }
+
+    /* Events Section */
+    .events-section { 
+      padding: 20px; 
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .events-section h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: var(--text-primary);
+    }
+    
+    .event-carousel {
+      display: flex;
+      gap: 16px;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      padding: 10px 0;
+      scrollbar-width: none; /* Firefox */
+    }
+    
+    .event-carousel::-webkit-scrollbar {
+      display: none; /* Chrome, Safari */
+    }
+    
+    .event-card {
+      scroll-snap-align: start;
+      min-width: 300px;
+      background: var(--dark-card);
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      text-align: left;
+      transition: transform 0.3s;
+    }
+    
+    .event-card:hover {
+      transform: translateY(-5px);
+    }
+    
+    .event-card img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+    
+    .event-card h3 { 
+      margin: 0 0 8px; 
+      color: var(--text-primary);
+    }
+    
+    .event-date {
+      color: var(--primary);
+      font-size: 0.9rem;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    
+    .event-card p {
+      color: var(--text-secondary);
+      margin: 0;
+      font-size: 0.9rem;
+    }
+
+    /* Dashboard Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; 
+      left: 0;
+      width: 100%; 
+      height: 100%;
+      background: rgba(0,0,0,0.8);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    
+    .modal-content {
+      background: var(--dark-card);
+      padding: 25px;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    
+    .modal-content h2 {
+      margin-top: 0;
+      text-align: center;
+      color: var(--text-primary);
+    }
+    
+    .profile-card {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    input, textarea {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0;
+      border: 1px solid var(--dark-border);
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-primary);
+      font-size: 1rem;
+      font-family: inherit;
+    }
+    
+    input::placeholder, textarea::placeholder {
+      color: var(--text-secondary);
+    }
+    
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+    
+    .modal-btn {
+      width: 100%;
+      padding: 12px;
+      margin: 5px 0;
+      border: none;
+      border-radius: 6px;
+      background: var(--primary);
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    
+    .modal-btn:hover {
+      background: var(--primary-dark);
+    }
+    
+    .google-btn {
+      background: #4285F4;
+    }
+    
+    .google-btn:hover {
+      background: #3367D6;
+    }
+    
+    .logout-btn { 
+      background: var(--accent); 
+      margin-top: 15px;
+    }
+    
+    .logout-btn:hover {
+      background: var(--accent-dark);
+    }
+
+    /* Profile Styles */
+    .avatar-container {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .avatar-preview {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: var(--primary);
+      margin: 0 auto 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      font-weight: bold;
+      color: white;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .avatar-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+      text-align: left;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .loading {
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
+    /* Admin Floating Button */
+    .admin-fab {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--secondary);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      font-size: 24px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      z-index: 999;
+      transition: all 0.3s;
+      display: flex;
+    }
+    
+    .admin-fab:hover {
+      background: var(--primary);
+      transform: scale(1.1);
+    }
+    
+    .admin-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      justify-content: center;
+      align-items: center;
+      z-index: 1001;
+    }
+    
+    .admin-panel {
+      background: var(--dark-card);
+      padding: 25px;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 500px;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+    
+    .admin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid var(--dark-border);
+    }
+    
+    .admin-header h2 {
+      margin: 0;
+      color: var(--text-primary);
+    }
+    
+    .close-btn {
+      background: none;
+      border: none;
+      color: var(--text-primary);
+      font-size: 24px;
+      cursor: pointer;
+      padding: 0;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .admin-buttons {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 10px;
+      margin: 20px 0;
+    }
+    
+    .admin-tab {
+      padding: 12px;
+      background: var(--secondary);
+      color: var(--text-primary);
+      border: none;
+      text-align: center;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: background 0.3s;
+    }
+    
+    .admin-tab.active {
+      background: var(--primary);
+    }
+    
+    .admin-tab:hover {
+      background: var(--primary);
+    }
+    
+    .admin-content {
+      display: none;
+      padding: 15px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      margin-top: 15px;
+    }
+    
+    .admin-content.active {
+      display: block;
+    }
+    
+    .admin-content h3 {
+      margin-top: 0;
+      color: var(--text-primary);
+    }
+    
+    .admin-content p {
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    /* Admin Login Modal */
+    .admin-login-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      justify-content: center;
+      align-items: center;
+      z-index: 1002;
+    }
+    
+    .admin-login-content {
+      background: var(--dark-card);
+      padding: 25px;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+    
+    .admin-login-content h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    /* Toast Notifications */
+    .toast {
+      position: fixed;
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--secondary);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 30px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      z-index: 1002;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    
+    .toast.show {
+      opacity: 1;
+    }
+    
+    @media (max-width: 768px) {
+      header h1 { 
+        font-size: 1.2rem; 
+      }
+      
+      .event-card {
+        min-width: 250px;
+      }
+      
+      .admin-buttons {
+        grid-template-columns: 1fr;
+      }
+      
+      .participant-chip {
+        max-width: 140px;
+        padding: 6px 10px;
+        font-size: 12px;
+      }
+      
+      .participant-avatar {
+        width: 20px;
+        height: 20px;
+        font-size: 10px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .participant-overlay {
+        gap: 5px;
+        padding: 5px;
+      }
+      
+      .participant-chip {
+        max-width: 120px;
+        padding: 4px 8px;
+        font-size: 11px;
+      }
+      
+      .top-overlay {
+        top: 40px;
+      }
+      
+      .bottom-overlay {
+        bottom: 60px;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div id="hero">
-            <div class="aspect-16-9" id="video-placeholder">
-                <video id="promo-video" muted loop></video>
-                <div id="jitsi-container"></div>
-            </div>
-            <div class="overlay overlay-top" id="speakers-overlay"></div>
-            <div class="overlay overlay-bottom" id="listeners-overlay"></div>
-            <button id="join-live-btn" style="display: none;">Join Live</button>
-        </div>
-        <div id="open-space-ui">
-            <div id="participants-list"></div>
-            <div id="reactions">
-                <button class="reaction-btn" data-emoji="❤️">❤️</button>
-                <button class="reaction-btn" data-emoji="👏">👏</button>
-                <button class="reaction-btn" data-emoji="🔥">🔥</button>
-            </div>
-            <button id="request-mic-btn" style="display: none;">Request Mic</button>
-            <button id="hide-listeners-btn">Hide Listeners</button>
-            <button id="minimize-btn">Minimize</button>
-            <button id="record-btn" style="display: none;">Record</button>
-        </div>
-        <div id="minimized-bar">
-            Open Space Running <button id="restore-btn">Restore</button>
-        </div>
-        <div id="events-section">
-            <h2>Events</h2>
-            <div class="carousel">
-                <div class="carousel-inner" id="events-carousel">
-                    <!-- Cards: Live Events, Hosted Calls, Upcoming -->
-                </div>
-            </div>
-        </div>
+  <header>
+    <h1>OpenDeSci Community Hub</h1>
+    <button id="authBtn">Sign Up</button>
+  </header>
+
+  <!-- Hero with Video -->
+  <div class="hero">
+    <!-- Promo Video (default) -->
+    <video autoplay muted loop playsinline id="promoVideo">
+      <source src="https://assets.codepen.io/3364143/sample.mp4" type="video/mp4">
+    </video>
+    
+    <!-- Live Video Container (hidden by default) -->
+    <div id="liveVideoContainer" style="display: none; width: 100%; height: 100%;"></div>
+    
+    <div class="watermark">OpenDeSci</div>
+    
+    <!-- Participant Overlays (hidden by default) -->
+    <div class="participant-overlay top-overlay" id="topParticipants" style="display: none;">
+      <!-- Speakers will be added here dynamically -->
     </div>
-    <button id="admin-btn">Admin Panel</button>
-    <div id="admin-panel">
+    
+    <div class="participant-overlay bottom-overlay" id="bottomParticipants" style="display: none;">
+      <!-- Listeners will be added here dynamically -->
+    </div>
+  </div>
+
+  <!-- Join Button Container (initially hidden) -->
+  <div id="joinButtonContainer" style="display: none; text-align: center; margin: 20px 0;">
+    <button class="join-btn" id="joinBtn">Join Live Session</button>
+  </div>
+
+  <!-- Events Section -->
+  <section class="events-section">
+    <h2>Community Events</h2>
+    <div class="event-carousel" id="eventCarousel">
+      <div class="event-card">
+        <img src="https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=200&q=80" alt="Live Events">
+        <h3>Weekly DeSci Discussion</h3>
+        <div class="event-date">Every Thursday, 5 PM UTC</div>
+        <p>Join our weekly community call to discuss DeSci developments and share ideas.</p>
+      </div>
+      <div class="event-card">
+        <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=200&q=80" alt="Hosted Calls">
+        <h3>Research Workshop</h3>
+        <div class="event-date">July 25, 2023 • 2 PM UTC</div>
+        <p>Learn how to conduct decentralized research and publish your findings on blockchain.</p>
+      </div>
+      <div class="event-card">
+        <img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=200&q=80" alt="Upcoming Events">
+        <h3>NFT Science Publishing</h3>
+        <div class="event-date">August 5, 2023 • 4 PM UTC</div>
+        <p>Explore the future of scientific publishing using NFTs and blockchain technology.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- User Dashboard Modal -->
+  <div id="dashboardModal" class="modal">
+    <div class="modal-content">
+      <div id="signupSection">
+        <h2>Join OpenDeSci</h2>
+        <input type="email" id="email" placeholder="Email address">
+        <input type="password" id="password" placeholder="Password">
+        <button class="modal-btn" id="emailSignupBtn">Create Account</button>
+        <button class="modal-btn" id="emailLoginBtn" style="background: var(--secondary); display: none;">Sign In</button>
+        <button class="modal-btn google-btn" id="googleSignupBtn">Continue with Google</button>
+        <p style="text-align: center; color: var(--text-secondary); margin-top: 15px;">
+          Already have an account? <a href="#" id="toggleLogin" style="color: var(--primary);">Sign in</a>
+          instead.
+        </p>
+      </div>
+      <div id="profileSection" style="display:none;">
+        <h2>My Profile</h2>
+        <div class="profile-card">
+          <div class="avatar-container">
+            <div class="avatar-preview" id="avatarPreview">
+              <span id="avatarInitial">U</span>
+              <img id="avatarImage" style="display: none;" alt="Profile Avatar">
+            </div>
+            <input type="file" id="avatarUpload" accept="image/*" style="display: none;">
+            <button class="modal-btn" id="changeAvatarBtn">Change Avatar</button>
+          </div>
+          
+          <div class="form-group">
+            <label for="profileUsername">Username</label>
+            <input type="text" id="profileUsername" placeholder="Choose a username">
+          </div>
+          
+          <div class="form-group">
+            <label for="profileBio">Bio</label>
+            <textarea id="profileBio" placeholder="Tell us about yourself" rows="3"></textarea>
+          </div>
+          
+          <button class="modal-btn" id="saveProfileBtn">Save Profile</button>
+          <button class="modal-btn logout-btn" id="logoutBtn">Logout</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Login Modal -->
+  <div class="admin-login-modal" id="adminLoginModal">
+    <div class="admin-login-content">
+      <h2>Admin Login</h2>
+      <input type="email" id="adminEmail" placeholder="Admin Email">
+      <input type="password" id="adminPassword" placeholder="Admin Password">
+      <button class="modal-btn" id="adminLoginBtn">Login as Admin</button>
+      <button class="modal-btn logout-btn" style="margin-top: 10px;" onclick="closeAdminLogin()">Cancel</button>
+    </div>
+  </div>
+
+  <!-- Floating Admin Button -->
+  <button class="admin-fab" id="openAdminBtn">👤</button>
+
+  <!-- Admin Panel Modal -->
+  <div class="admin-modal" id="adminModal">
+    <div class="admin-panel">
+      <div class="admin-header">
         <h2>Admin Panel</h2>
-        <div class="admin-card">
-            <button class="toggle-btn" data-target="settings-card">Toggle Settings</button>
-            <div id="settings-card" style="display: none;">
-                <h3>Settings</h3>
-                <button id="start-live-btn">Start Live</button>
-                <button id="end-live-btn">End Live</button>
-                <button id="restart-live-btn">Restart Live</button>
-                <select id="mode-select">
-                    <option value="video">Video</option>
-                    <option value="audio">Open Space</option>
-                </select>
-                <input id="promo-url-input" placeholder="Promo Video URL">
-                <button id="save-promo-btn">Save Promo</button>
-                <input id="rtmp-url-input" placeholder="RTMP URL">
-                <input id="stream-key-input" placeholder="Stream Key">
-                <button id="start-broadcast-btn">Start Broadcast</button>
-                <select id="public-private-select">
-                    <option value="public">Public</option>
-                    <option value="private">Private</option>
-                </select>
-                <div id="invites-section" style="display: none;">
-                    <input id="invite-user-input" placeholder="User ID to Invite">
-                    <button id="add-invite-btn">Add Invite</button>
-                    <div id="invites-list"></div>
-                </div>
-                <button id="pause-promo-btn">Pause Promo</button>
-            </div>
+        <button class="close-btn" id="closeAdminBtn">&times;</button>
+      </div>
+      
+      <div class="admin-buttons">
+        <button class="admin-tab active" data-target="settings">Settings</button>
+        <button class="admin-tab" data-target="participants">Participants</button>
+        <button class="admin-tab" data-target="events">Events</button>
+      </div>
+      
+      <div class="admin-content active" id="settings">
+        <h3>Session Settings</h3>
+        
+        <div class="form-group">
+          <label for="session-type">Session Type</label>
+          <select id="session-type">
+            <option value="public">Public</option>
+            <option value="private">Private (Invite Only)</option>
+          </select>
         </div>
-        <div class="admin-card">
-            <button class="toggle-btn" data-target="participants-card">Toggle Participants</button>
-            <div id="participants-card" style="display: none;">
-                <h3>Participants</h3>
-                <div id="participants-list-admin"></div>
-                <div id="mic-requests"></div>
-            </div>
+        
+        <div id="invite-section" style="display: none;">
+          <h4>Invite Users</h4>
+          <div class="form-group">
+            <input type="text" id="invite-username" placeholder="Enter username">
+            <button class="modal-btn" onclick="addInvite()">Add Invite</button>
+          </div>
+          <div id="invite-list"></div>
         </div>
-        <div class="admin-card">
-            <button class="toggle-btn" data-target="events-card">Toggle Event Management</button>
-            <div id="events-card" style="display: none;">
-                <h3>Event Management</h3>
-                <input id="event-title" placeholder="Title">
-                <input id="event-date" type="date">
-                <textarea id="event-desc" placeholder="Description"></textarea>
-                <button id="create-event-btn">Create Event</button>
-                <div id="events-list-admin"></div>
-            </div>
+        
+        <div class="admin-controls">
+          <button class="modal-btn" id="startLiveBtn" style="margin-top: 15px;">Start Live Session</button>
+          <button class="modal-btn logout-btn" id="endLiveBtn" style="display: none; margin-top: 10px;">End Live Session</button>
         </div>
+      </div>
+      
+      <div class="admin-content" id="participants">
+        <h3>Participant Management</h3>
+        <p>Approve microphone requests, mute or unmute participants, manage speakers and listeners.</p>
+        <div id="participants-list">
+          <p>No participants yet. Start a live session to manage participants.</p>
+        </div>
+      </div>
+      
+      <div class="admin-content" id="events">
+        <h3>Event Management</h3>
+        <p>Create, edit, or delete community events. Schedule upcoming sessions and manage event details.</p>
+        <button class="modal-btn" onclick="showEventModal()">Create New Event</button>
+        <div id="events-list">
+          <p>No events created yet.</p>
+        </div>
+      </div>
     </div>
-    <!-- Modals -->
-    <div id="auth-modal" class="modal">
-        <div class="modal-content">
-            <h2>Login / Register</h2>
-            <input id="email" type="email" placeholder="Email">
-            <input id="password" type="password" placeholder="Password">
-            <button id="login-btn">Login</button>
-            <button id="register-btn">Register</button>
-        </div>
-    </div>
-    <div id="profile-modal" class="modal">
-        <div class="modal-content">
-            <h2>Set Profile</h2>
-            <input id="username" placeholder="Username">
-            <input id="bio" placeholder="Bio">
-            <input id="avatar-upload" type="file" accept="image/*">
-            <button id="save-profile-btn">Save</button>
-        </div>
-    </div>
-    <div id="toast" class="toast"></div>
+  </div>
 
-    <!-- Scripts -->
-    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js"></script>
-    <script src="https://meet.jit.si/external_api.js"></script>
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyCie4lyWxHhnfaRZnKZI4crWHQQ18EjVVo",
-            authDomain: "opendesci-community.firebaseapp.com",
-            projectId: "opendesci-community",
-            storageBucket: "opendesci-community.firebasestorage.app",
-            messagingSenderId: "175060392409",
-            appId: "1:175060392409:web:d86e37965cefc1961f21c8",
-            measurementId: "G-NPY0HT1R1N"
+  <!-- Toast Notification -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // Firebase Configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyCie4lyWxHhnfaRZnKZI4crWHQQ18EjVVo",
+      authDomain: "opendesci-community.firebaseapp.com",
+      projectId: "opendesci-community",
+      storageBucket: "opendesci-community.firebasestorage.app",
+      messagingSenderId: "175060392409",
+      appId: "1:175060392409:web:d86e37965cefc1961f21c8",
+      measurementId: "G-NPY0HT1R1N"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const storage = firebase.storage();
+
+    // Configuration
+    const PROMO_URL = 'https://assets.codepen.io/3364143/sample.mp4';
+    
+    // DOM Elements
+    const authBtn = document.getElementById("authBtn");
+    const modal = document.getElementById("dashboardModal");
+    const signupSection = document.getElementById("signupSection");
+    const profileSection = document.getElementById("profileSection");
+    const joinBtn = document.getElementById("joinBtn");
+    const joinButtonContainer = document.getElementById("joinButtonContainer");
+    const openAdminBtn = document.getElementById("openAdminBtn");
+    const adminModal = document.getElementById("adminModal");
+    const adminLoginModal = document.getElementById("adminLoginModal");
+    const closeAdminBtn = document.getElementById("closeAdminBtn");
+    const adminTabs = document.querySelectorAll(".admin-tab");
+    const adminContents = document.querySelectorAll(".admin-content");
+    const promoVideo = document.getElementById("promoVideo");
+    const liveVideoContainer = document.getElementById("liveVideoContainer");
+    const topParticipants = document.getElementById("topParticipants");
+    const bottomParticipants = document.getElementById("bottomParticipants");
+    const startLiveBtn = document.getElementById("startLiveBtn");
+    const endLiveBtn = document.getElementById("endLiveBtn");
+    const toast = document.getElementById("toast");
+
+    // State
+    let loggedIn = false;
+    let joined = false;
+    let isLive = false;
+    let currentUserProfile = null;
+    let jitsiApi = null;
+    let currentSession = null;
+    let isPrivateSession = false;
+    let invitedUsers = [];
+    let participants = [];
+
+    // Initialize the application
+    function init() {
+      setupEventListeners();
+      setupPromoVideo();
+      setupEventCarousel();
+      setupAuthListener();
+      loadEventsFromFirestore();
+    }
+
+    // Set up all event listeners
+    function setupEventListeners() {
+      // Auth Button Click
+      authBtn.addEventListener("click", showAuthModal);
+      
+      // Join Button Click
+      joinBtn.addEventListener("click", toggleJoinStatus);
+      
+      // Logout Functionality
+      document.getElementById("logoutBtn").addEventListener("click", logout);
+      
+      // Sign Up Functionality
+      document.getElementById("emailSignupBtn").addEventListener("click", signUpWithEmail);
+      
+      // Sign In Functionality
+      document.getElementById("emailLoginBtn").addEventListener("click", signInWithEmail);
+      
+      // Google Sign In
+      document.getElementById("googleSignupBtn").addEventListener("click", signInWithGoogle);
+      
+      // Toggle between login/signup
+      document.getElementById("toggleLogin").addEventListener("click", function(e) {
+        e.preventDefault();
+        const signupBtn = document.getElementById("emailSignupBtn");
+        const loginBtn = document.getElementById("emailLoginBtn");
+        const toggleLink = document.getElementById("toggleLogin");
+        
+        if (signupBtn.style.display !== "none") {
+          signupBtn.style.display = "none";
+          loginBtn.style.display = "block";
+          toggleLink.textContent = "Create account";
+        } else {
+          signupBtn.style.display = "block";
+          loginBtn.style.display = "none";
+          toggleLink.textContent = "Sign in";
+        }
+      });
+      
+      // Admin Panel Functionality
+      openAdminBtn.addEventListener("click", () => {
+        if (!auth.currentUser) {
+          showAdminLoginModal();
+          return;
+        }
+        
+        // Check if user is admin
+        checkAdminStatus(auth.currentUser.uid).then(isAdmin => {
+          if (isAdmin) {
+            adminModal.style.display = "flex";
+          } else {
+            showToast('Admin access required');
+          }
+        });
+      });
+
+      // Admin login
+      document.getElementById("adminLoginBtn").addEventListener("click", adminLogin);
+
+      closeAdminBtn.addEventListener("click", () => {
+        adminModal.style.display = "none";
+      });
+
+      // Admin Tab Switching
+      adminTabs.forEach(tab => {
+        tab.addEventListener("click", () => {
+          const target = tab.getAttribute("data-target");
+          
+          // Update active tab
+          adminTabs.forEach(t => t.classList.remove("active"));
+          tab.classList.add("active");
+          
+          // Show corresponding content
+          adminContents.forEach(content => {
+            content.classList.remove("active");
+            if (content.id === target) {
+              content.classList.add("active");
+            }
+          });
+        });
+      });
+
+      // Session type change handler
+      document.getElementById('session-type').addEventListener('change', (e) => {
+        const isPrivate = e.target.value === 'private';
+        document.getElementById('invite-section').style.display = isPrivate ? 'block' : 'none';
+        
+        if (!isPrivate) {
+          invitedUsers = [];
+          updateInviteList();
+        }
+      });
+
+
+            // Start/End Live buttons
+      startLiveBtn.addEventListener("click", startLive);
+      endLiveBtn.addEventListener("click", endLive);
+
+      // Avatar upload
+      document.getElementById('changeAvatarBtn').addEventListener('click', () => {
+        document.getElementById('avatarUpload').click();
+      });
+
+      document.getElementById('avatarUpload').addEventListener('change', (e) => {
+        if (e.target.files && e.target.files[0]) {
+          const file = e.target.files[0];
+          const userId = auth.currentUser.uid;
+          
+          // Validate file type and size
+          if (!file.type.startsWith('image/')) {
+            showToast('Please select an image file');
+            return;
+          }
+          
+          if (file.size > 5 * 1024 * 1024) { // 5MB limit
+            showToast('Image must be less than 5MB');
+            return;
+          }
+          
+          // Show loading state
+          const avatarBtn = document.getElementById('changeAvatarBtn');
+          avatarBtn.textContent = 'Uploading...';
+          avatarBtn.classList.add('loading');
+          
+          uploadAvatar(file, userId)
+            .then((avatarUrl) => {
+              // Update preview immediately
+              updateAvatarPreview(avatarUrl, currentUserProfile.username);
+              
+              // Update auth button with avatar
+              authBtn.innerHTML = `<img src="${avatarUrl}" style="width: 24px; height: 24px; border-radius: 50%;"> ${currentUserProfile.username}`;
+            })
+            .catch((error) => {
+              console.error('Upload failed:', error);
+            })
+            .finally(() => {
+              avatarBtn.textContent = 'Change Avatar';
+              avatarBtn.classList.remove('loading');
+              // Reset file input
+              e.target.value = '';
+            });
+        }
+      });
+
+      // Save profile
+      document.getElementById('saveProfileBtn').addEventListener('click', saveProfile);
+
+      // Close modals when clicking outside
+      window.addEventListener("click", (e) => {
+        if (e.target === modal) {
+          modal.style.display = "none";
+        }
+        if (e.target === adminModal) {
+          adminModal.style.display = "none";
+        }
+        if (e.target === adminLoginModal) {
+          adminLoginModal.style.display = "none";
+        }
+      });
+    }
+
+    // Set up promo video
+    function setupPromoVideo() {
+      promoVideo.src = PROMO_URL;
+      promoVideo.load();
+      
+      // Try to autoplay the promo video
+      promoVideo.play().catch(error => {
+        console.log('Autoplay prevented:', error);
+        showToast('Click to play video');
+      });
+    }
+
+    // Set up event carousel with auto-slide
+    function setupEventCarousel() {
+      const carousel = document.getElementById('eventCarousel');
+      let currentIndex = 0;
+      const cards = carousel.querySelectorAll('.event-card');
+      const totalCards = cards.length;
+
+      function goToSlide(index) {
+        currentIndex = index;
+        carousel.scrollTo({
+          left: index * cards[0].offsetWidth,
+          behavior: 'smooth'
+        });
+      }
+
+      function nextSlide() {
+        const next = (currentIndex + 1) % totalCards;
+        goToSlide(next);
+      }
+
+      // Set up auto-advance every 4 seconds
+      let intervalId = setInterval(nextSlide, 4000);
+
+      // Pause auto-advance when user interacts with carousel
+      carousel.addEventListener('mouseenter', () => {
+        clearInterval(intervalId);
+      });
+
+      carousel.addEventListener('mouseleave', () => {
+        intervalId = setInterval(nextSlide, 4000);
+      });
+
+      // Swipe for mobile
+      setupCarouselSwipe(carousel, goToSlide, nextSlide, () => {
+        intervalId = setInterval(nextSlide, 4000);
+      });
+    }
+
+    // Load events from Firestore
+    function loadEventsFromFirestore() {
+      db.collection('events').where('active', '==', true).get()
+        .then((querySnapshot) => {
+          const eventsContainer = document.getElementById('eventCarousel');
+          eventsContainer.innerHTML = '';
+          
+          if (querySnapshot.empty) {
+            eventsContainer.innerHTML = '<p>No upcoming events</p>';
+            return;
+          }
+          
+          querySnapshot.forEach((doc) => {
+            const event = doc.data();
+            const eventDate = event.date.toDate ? event.date.toDate() : new Date(event.date);
+            const formattedDate = eventDate.toLocaleDateString('en-US', {
+              weekday: 'long',
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
+            });
+            
+            const eventCard = document.createElement('div');
+            eventCard.className = 'event-card';
+            eventCard.innerHTML = `
+              <img src="${event.imageUrl || 'https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=200&q=80'}" alt="${event.title}">
+              <h3>${event.title}</h3>
+              <div class="event-date">${formattedDate}</div>
+              <p>${event.description}</p>
+            `;
+            eventsContainer.appendChild(eventCard);
+          });
+        })
+        .catch((error) => {
+          console.error('Error loading events:', error);
+        });
+    }
+
+    // Set up swipe functionality for carousel
+    function setupCarouselSwipe(carousel, goToSlide, nextSlide, resetInterval) {
+      let startX = 0;
+      let isDragging = false;
+      let currentIndex = 0;
+      const cards = carousel.querySelectorAll('.event-card');
+      const totalCards = cards.length;
+
+      carousel.addEventListener('touchstart', (e) => {
+        startX = e.touches[0].clientX;
+        isDragging = true;
+        clearInterval(intervalId);
+      });
+
+      carousel.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
+        const diff = e.touches[0].clientX - startX;
+        carousel.scrollLeft = (currentIndex * cards[0].offsetWidth) - diff;
+      });
+
+      carousel.addEventListener('touchend', (e) => {
+        isDragging = false;
+        const diff = e.changedTouches[0].clientX - startX;
+        if (Math.abs(diff) > 50) {
+          if (diff < 0) nextSlide();
+          else goToSlide((currentIndex - 1 + totalCards) % totalCards);
+        } else {
+          goToSlide(currentIndex);
+        }
+        resetInterval();
+      });
+    }
+
+    // Auth state listener
+    function setupAuthListener() {
+      auth.onAuthStateChanged((user) => {
+        if (user) {
+          loggedIn = true;
+          
+          // Load user profile
+          loadUserProfile(user.uid);
+        } else {
+          loggedIn = false;
+          authBtn.textContent = "Sign Up";
+          authBtn.innerHTML = "Sign Up";
+        }
+      });
+    }
+
+    // Check if user is admin and return promise with status
+    function checkAdminStatus(uid) {
+      return new Promise((resolve) => {
+        db.collection('admins').doc(uid).get()
+          .then((doc) => {
+            resolve(doc.exists);
+          })
+          .catch((error) => {
+            console.error('Error checking admin status:', error);
+            resolve(false);
+          });
+      });
+    }
+
+    // Show authentication modal
+    function showAuthModal() {
+      modal.style.display = "flex";
+      if (loggedIn) {
+        signupSection.style.display = "none";
+        profileSection.style.display = "block";
+      } else {
+        signupSection.style.display = "block";
+        profileSection.style.display = "none";
+      }
+    }
+
+    // Show admin login modal
+    function showAdminLoginModal() {
+      adminLoginModal.style.display = "flex";
+    }
+
+    // Close admin login modal
+    function closeAdminLogin() {
+      adminLoginModal.style.display = "none";
+    }
+
+    // Admin login
+    function adminLogin() {
+      const email = document.getElementById("adminEmail").value;
+      const password = document.getElementById("adminPassword").value;
+      
+      if (!email || !password) {
+        showToast('Please enter both email and password');
+        return;
+      }
+      
+      auth.signInWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+          // Check if user is admin
+          return checkAdminStatus(userCredential.user.uid);
+        })
+        .then((isAdmin) => {
+          if (isAdmin) {
+            adminLoginModal.style.display = "none";
+            adminModal.style.display = "flex";
+            showToast('Admin login successful');
+          } else {
+            showToast('Admin access required');
+            auth.signOut();
+          }
+        })
+        .catch((error) => {
+          showToast('Error: ' + error.message);
+        });
+    }
+
+    // Sign up with email
+    function signUpWithEmail() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      
+      if (!email || !password) {
+        showToast('Please enter both email and password');
+        return;
+      }
+      
+      auth.createUserWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+          // Create user profile in Firestore
+          return db.collection('profiles').doc(userCredential.user.uid).set({
+            email: email,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            username: email.split('@')[0] // Default username
+          });
+        })
+        .then(() => {
+          loggedIn = true;
+          modal.style.display = "none";
+          showToast('Account created successfully');
+        })
+        .catch((error) => {
+          showToast('Error: ' + error.message);
+        });
+    }
+
+    // Sign in with email
+    function signInWithEmail() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      
+      if (!email || !password) {
+        showToast('Please enter both email and password');
+        return;
+      }
+      
+      auth.signInWithEmailAndPassword(email, password)
+        .then(() => {
+          loggedIn = true;
+          modal.style.display = "none";
+          showToast('Signed in successfully');
+        })
+        .catch((error) => {
+          showToast('Error: ' + error.message);
+        });
+    }
+
+    // Google Sign In
+    function signInWithGoogle() {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      
+      auth.signInWithPopup(provider)
+        .then((result) => {
+          // Check if user profile exists, if not create one
+          return db.collection('profiles').doc(result.user.uid).get()
+            .then((doc) => {
+              if (!doc.exists) {
+                return db.collection('profiles').doc(result.user.uid).set({
+                  email: result.user.email,
+                  createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                  username: result.user.displayName || result.user.email.split('@')[0]
+                });
+              }
+            });
+        })
+        .then(() => {
+          loggedIn = true;
+          modal.style.display = "none";
+          showToast('Signed in with Google');
+        })
+        .catch((error) => {
+          showToast('Error: ' + error.message);
+        });
+    }
+
+    // Load user profile from Firestore
+    function loadUserProfile(uid) {
+      db.collection('profiles').doc(uid).get()
+        .then((doc) => {
+          if (doc.exists) {
+            const userData = doc.data();
+            currentUserProfile = userData;
+            
+            // Update profile form
+            document.getElementById('profileUsername').value = userData.username || '';
+            document.getElementById('profileBio').value = userData.bio || '';
+            
+            // Update avatar
+            updateAvatarPreview(userData.avatarUrl, userData.username);
+            
+            // Update auth button with avatar if available
+            if (userData.avatarUrl) {
+              authBtn.innerHTML = `<img src="${userData.avatarUrl}" style="width: 24px; height: 24px; border-radius: 50%;"> ${userData.username}`;
+            } else if (userData.username) {
+              authBtn.textContent = userData.username;
+            }
+          } else {
+            // Create default profile if it doesn't exist
+            createDefaultProfile(uid);
+          }
+        })
+        .catch((error) => {
+          console.error('Error loading profile:', error);
+          showToast('Error loading profile');
+        });
+    }
+
+    // Create default profile
+    function createDefaultProfile(uid) {
+      const user = auth.currentUser;
+      const defaultProfile = {
+        email: user.email,
+        username: user.email.split('@')[0],
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+      };
+      
+      db.collection('profiles').doc(uid).set(defaultProfile)
+        .then(() => {
+          currentUserProfile = defaultProfile;
+          document.getElementById('profileUsername').value = defaultProfile.username;
+          updateAvatarPreview(null, defaultProfile.username);
+          authBtn.textContent = defaultProfile.username;
+        })
+        .catch((error) => {
+          console.error('Error creating profile:', error);
+        });
+    }
+
+    // Update avatar preview
+    function updateAvatarPreview(avatarUrl, username) {
+      const avatarImage = document.getElementById('avatarImage');
+      const avatarInitial = document.getElementById('avatarInitial');
+      
+      if (avatarUrl) {
+        avatarImage.src = avatarUrl;
+        avatarImage.style.display = 'block';
+        avatarInitial.style.display = 'none';
+      } else {
+        avatarImage.style.display = 'none';
+        avatarInitial.style.display = 'block';
+        avatarInitial.textContent = username ? username.charAt(0).toUpperCase() : 'U';
+      }
+    }
+
+    // Upload avatar to Firebase Storage
+    function uploadAvatar(file, userId) {
+      const storageRef = storage.ref();
+      const avatarRef = storageRef.child(`avatars/${userId}/${file.name}`);
+      
+      showToast('Uploading avatar...');
+      
+      return avatarRef.put(file)
+        .then((snapshot) => {
+          return snapshot.ref.getDownloadURL();
+        })
+        .then((downloadURL) => {
+          // Update profile with new avatar URL
+          return db.collection('profiles').doc(userId).update({
+            avatarUrl: downloadURL,
+            lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+          });
+        })
+        .then(() => {
+          showToast('Avatar updated successfully');
+          return downloadURL;
+        })
+        .catch((error) => {
+          console.error('Error uploading avatar:', error);
+          showToast('Error uploading avatar');
+          throw error;
+        });
+    }
+
+    // Save profile data
+    function saveProfile() {
+      const userId = auth.currentUser.uid;
+      const username = document.getElementById('profileUsername').value.trim();
+      const bio = document.getElementById('profileBio').value.trim();
+      
+      if (!username) {
+        showToast('Username is required');
+        return;
+      }
+      
+      // Show loading state
+      const saveBtn = document.getElementById('saveProfileBtn');
+      saveBtn.textContent = 'Saving...';
+      saveBtn.classList.add('loading');
+      
+      const updateData = {
+        username: username,
+        bio: bio,
+        lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+      };
+      
+      db.collection('profiles').doc(userId).update(updateData)
+        .then(() => {
+          showToast('Profile saved successfully');
+          
+          // Update auth button
+          if (currentUserProfile.avatarUrl) {
+            authBtn.innerHTML = `<img src="${currentUserProfile.avatarUrl}" style="width: 24px; height: 24px; border-radius: 50%;"> ${username}`;
+          } else {
+            authBtn.textContent = username;
+          }
+          
+          // Update current profile
+          currentUserProfile.username = username;
+          currentUserProfile.bio = bio;
+        })
+        .catch((error) => {
+          console.error('Error saving profile:', error);
+          showToast('Error saving profile');
+        })
+        .finally(() => {
+          saveBtn.textContent = 'Save Profile';
+          saveBtn.classList.remove('loading');
+        });
+    }
+
+    // Toggle join status
+    function toggleJoinStatus() {
+      if (!isLive) {
+        showToast('No live session is currently active');
+        return;
+      }
+      
+      // Check if private session and user is invited
+      if (isPrivateSession && auth.currentUser) {
+        checkIfUserIsInvited(auth.currentUser.uid).then((isInvited) => {
+          if (!isInvited) {
+            showToast('This is a private session. You need an invitation to join.');
+            return;
+          }
+          joinSession();
+        });
+      } else if (isPrivateSession && !auth.currentUser) {
+        showToast('Please login to join this private session');
+        showAuthModal();
+      } else {
+        joinSession();
+      }
+    }
+
+    // Join session logic
+    function joinSession() {
+      joined = !joined;
+      
+      if (joined) {
+        joinBtn.textContent = "Leave Session";
+        joinBtn.style.background = "var(--secondary)";
+        showToast('Joined the live session');
+        
+        // Show participant overlays
+        topParticipants.style.display = "flex";
+        bottomParticipants.style.display = "flex";
+        
+        // Add real participants from Jitsi
+        updateParticipantsFromJitsi();
+      } else {
+        joinBtn.textContent = "Join Live Session";
+        joinBtn.style.background = "var(--accent)";
+        showToast('Left the session');
+        
+        // Hide participant overlays
+        topParticipants.style.display = "none";
+        bottomParticipants.style.display = "none";
+      }
+    }
+
+    // Check if user is invited to private session
+    function checkIfUserIsInvited(userId) {
+      return db.collection('sessions').doc(currentSession.id).get()
+        .then((doc) => {
+          if (!doc.exists) return false;
+          
+          const sessionData = doc.data();
+          if (sessionData.type !== 'private') return true;
+          
+          return sessionData.invitedUsers && 
+                 sessionData.invitedUsers.some(u => u.userId === userId);
+        })
+        .catch((error) => {
+          console.error('Error checking invite status:', error);
+          return false;
+        });
+    }
+
+    // Start live session (admin only)
+    function startLive() {
+      const sessionType = document.getElementById('session-type').value;
+      isPrivateSession = sessionType === 'private';
+      
+      // Create session data
+      currentSession = {
+        id: 'session-' + Date.now(),
+        type: sessionType,
+        isLive: true,
+        createdAt: new Date().toISOString(),
+        createdBy: auth.currentUser.uid
+      };
+      
+      // If private session, add invites
+      if (isPrivateSession) {
+        currentSession.invitedUsers = invitedUsers;
+      }
+      
+      // Save session to Firestore
+      db.collection('sessions').doc(currentSession.id).set(currentSession)
+        .then(() => {
+          isLive = true;
+          startLiveBtn.style.display = 'none';
+          endLiveBtn.style.display = 'block';
+          
+          // Show join button below video
+          joinButtonContainer.style.display = 'block';
+          
+          // Show/hide invite section based on session type
+          document.getElementById('invite-section').style.display = isPrivateSession ? 'block' : 'none';
+
+                        // Hide promo video and show live container
+          promoVideo.style.display = 'none';
+          liveVideoContainer.style.display = 'block';
+          
+          showToast(isPrivateSession ? 'Private session started' : 'Live session started');
+          
+          // Initialize Jitsi Meet
+          initJitsi();
+        })
+        .catch((error) => {
+          console.error('Error creating session:', error);
+          showToast('Error starting session');
+        });
+    }
+
+    // Initialize Jitsi Meet
+    function initJitsi() {
+      const domain = 'meet.jit.si';
+      const roomName = currentSession.id;
+      
+      const options = {
+        roomName: roomName,
+        width: '100%',
+        height: '100%',
+        parentNode: liveVideoContainer,
+        configOverwrite: {
+          startWithAudioMuted: true,
+          startWithVideoMuted: false,
+          enableWelcomePage: false,
+          prejoinPageEnabled: false,
+          disableDeepLinking: true,
+          disableInviteFunctions: true,
+          enableClosePage: false,
+          disableProfile: true,
+          enableEmailInStats: false,
+          enableWelcomePage: false,
+          enableCalendarIntegration: false,
+          enableInsecureRoomNameWarning: false,
+          enableLayerSuspension: true,
+          enableNoAudioDetection: false,
+          enableNoisyMicDetection: false,
+          enableTalkWhileMuted: false,
+          prejoinPageEnabled: false,
+          requireDisplayName: true,
+          startAudioOnly: false,
+          startScreenSharing: false,
+          subject: 'OpenDeSci Live Session'
+        },
+        interfaceConfigOverwrite: {
+          TOOLBAR_BUTTONS: [
+            'microphone', 'camera', 'closedcaptions', 'desktop', 'fullscreen',
+            'fodeviceselection', 'hangup', 'profile', 'chat', 'recording',
+            'livestreaming', 'settings', 'raisehand', 'videoquality', 'filmstrip',
+            'invite', 'feedback', 'stats', 'shortcuts', 'tileview',
+            'videobackgroundblur', 'download', 'help', 'mute-everyone', 'security'
+          ],
+          SHOW_JITSI_WATERMARK: false,
+          SHOW_WATERMARK_FOR_GUESTS: false,
+          SHOW_BRAND_WATERMARK: false,
+          BRAND_WATERMARK_LINK: '',
+          SHOW_POWERED_BY: false,
+          DISABLE_VIDEO_BACKGROUND: false,
+          DISABLE_FOCUS_INDICATOR: false,
+          DISABLE_DOMINANT_SPEAKER_INDICATOR: false,
+          DISABLE_PRESENCE_STATUS: false,
+          DISABLE_TRANSCRIPTION_SUBTITLES: false,
+          DISABLE_RINGING: false,
+          APP_NAME: 'OpenDeSci',
+          NATIVE_APP_NAME: 'OpenDeSci',
+          PROVIDER_NAME: 'OpenDeSci',
+          LANG_DETECTION: false,
+          CONNECTION_INDICATOR_DISABLED: false
+        },
+        userInfo: {
+          displayName: currentUserProfile ? currentUserProfile.username : 'User',
+          email: auth.currentUser.email
+        }
+      };
+      
+      try {
+        jitsiApi = new JitsiMeetExternalAPI(domain, options);
+        
+        jitsiApi.addEventListener('videoConferenceJoined', () => {
+          console.log('Joined the conference as host');
+          showToast('Live session started as host');
+        });
+        
+        jitsiApi.addEventListener('videoConferenceLeft', () => {
+          console.log('Left the conference');
+          if (isLive) {
+            endLive();
+          }
+        });
+        
+        jitsiApi.addEventListener('participantJoined', (participant) => {
+          console.log('Participant joined:', participant);
+          participants.push(participant);
+          updateParticipantsFromJitsi();
+        });
+        
+        jitsiApi.addEventListener('participantLeft', (participant) => {
+          console.log('Participant left:', participant);
+          participants = participants.filter(p => p.id !== participant.id);
+          updateParticipantsFromJitsi();
+        });
+        
+      } catch (error) {
+        console.error('Error initializing Jitsi:', error);
+        showToast('Error starting live session');
+        endLive();
+      }
+    }
+
+    // Update participants from Jitsi
+    function updateParticipantsFromJitsi() {
+      if (!jitsiApi || !joined) return;
+      
+      // Clear existing participants
+      topParticipants.innerHTML = '';
+      bottomParticipants.innerHTML = '';
+      
+      // Get all participants from Jitsi
+      jitsiApi.getParticipantsInfo().then(participantsInfo => {
+        // Add host first (current user)
+        const host = {
+          displayName: currentUserProfile.username,
+          role: 'Host',
+          isSpeaker: true
         };
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-        const storage = firebase.storage();
+        
+        // Add host to top (speakers)
+        addParticipantToOverlay(host, topParticipants);
+        
+        // Add other participants
+        participantsInfo.forEach(participant => {
+          const participantData = {
+            displayName: participant.displayName,
+            role: participant.role || 'Listener',
+            isSpeaker: participant.role === 'moderator' || participant.role === 'speaker'
+          };
+          
+          if (participantData.isSpeaker) {
+            addParticipantToOverlay(participantData, topParticipants);
+          } else {
+            addParticipantToOverlay(participantData, bottomParticipants);
+          }
+        });
+      });
+    }
 
-        let currentUser = null;
-        let isAdmin = false;
-        let jitsiApi = null;
-        let currentSessionId = null;
-        let sessionMode = 'video';
-        let isJoined = false;
-        let isMinimized = false;
-        let hideListeners = false;
-        let promoVideo = document.getElementById('promo-video');
+    // Add participant to overlay
+    function addParticipantToOverlay(participant, overlay) {
+      const chip = document.createElement('div');
+      chip.className = 'participant-chip';
+      chip.innerHTML = `
+        <div class="participant-avatar">${participant.displayName.charAt(0)}</div>
+        <span>${participant.displayName}</span>
+        <span class="participant-role">${participant.role}</span>
+      `;
+      overlay.appendChild(chip);
+    }
 
-        // Toast function
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.style.display = 'block';
-            setTimeout(() => { toast.style.display = 'none'; }, 3000);
-        }
+    // End live session (admin only)
+    function endLive() {
+      // Update session status in Firestore
+      if (currentSession) {
+        db.collection('sessions').doc(currentSession.id).update({
+          isLive: false,
+          endedAt: new Date().toISOString()
+        });
+      }
+      
+      // Reset session state
+      isLive = false;
+      joined = false;
+      currentSession = null;
+      isPrivateSession = false;
+      invitedUsers = [];
+      participants = [];
+      
+      // Reset UI
+      startLiveBtn.style.display = 'block';
+      endLiveBtn.style.display = 'none';
+      joinButtonContainer.style.display = 'none';
+      document.getElementById('invite-section').style.display = 'none';
+      
+      // Dispose Jitsi if it exists
+      if (jitsiApi) {
+        jitsiApi.dispose();
+        jitsiApi = null;
+      }
+      
+      // Show promo video and hide live container
+      promoVideo.style.display = 'block';
+      liveVideoContainer.style.display = 'none';
+      
+      // Hide participant overlays
+      topParticipants.style.display = "none";
+      bottomParticipants.style.display = "none";
+      
+      // Reset join button
+      joinBtn.textContent = "Join Live Session";
+      joinBtn.style.background = "var(--accent)";
+      
+      showToast('Live session ended');
+    }
 
-        // Auth state listener
-        auth.onAuthStateChanged(async user => {
-            currentUser = user;
-            if (user) {
-                document.getElementById('auth-modal').style.display = 'none';
-                document.getElementById('admin-btn').style.display = 'block';
-                // Check if admin
-                const adminDoc = await db.collection('admins').doc(user.uid).get();
-                isAdmin = adminDoc.exists;
-                // Check profile
-                const profileDoc = await db.collection('profiles').doc(user.uid).get();
-                if (!profileDoc.exists || !profileDoc.data().username) {
-                    document.getElementById('profile-modal').style.display = 'flex';
-                }
-                // Load promo
-                loadPromo();
-                // Listen for sessions
-                listenForSessions();
+    // Add user to invite list
+    function addInvite() {
+      const usernameInput = document.getElementById('invite-username');
+      const username = usernameInput.value.trim();
+      
+      if (!username) {
+        showToast('Please enter a username');
+        return;
+      }
+      
+      // Check if user exists
+      db.collection('profiles')
+        .where('username', '==', username)
+        .get()
+        .then((querySnapshot) => {
+          if (querySnapshot.empty) {
+            showToast('User not found');
+            return;
+          }
+          
+          querySnapshot.forEach((doc) => {
+            const userData = doc.data();
+            const userId = doc.id;
+            
+            // Add to invited users if not already added
+            if (!invitedUsers.some(u => u.userId === userId)) {
+              invitedUsers.push({
+                userId: userId,
+                username: userData.username,
+                email: userData.email
+              });
+              
+              updateInviteList();
+              usernameInput.value = '';
+              showToast(`${username} added to invites`);
             } else {
-                document.getElementById('auth-modal').style.display = 'flex';
-                document.getElementById('admin-btn').style.display = 'none';
-                document.getElementById('admin-panel').style.display = 'none';
+              showToast(`${username} is already invited`);
             }
+          });
+        })
+        .catch((error) => {
+          console.error('Error finding user:', error);
+          showToast('Error finding user');
         });
+    }
 
+    // Update invite list display
+    function updateInviteList() {
+      const inviteList = document.getElementById('invite-list');
+      inviteList.innerHTML = '';
+      
+      if (invitedUsers.length === 0) {
+        inviteList.innerHTML = '<p>No users invited yet</p>';
+        return;
+      }
+      
+      invitedUsers.forEach((user, index) => {
+        const inviteItem = document.createElement('div');
+        inviteItem.className = 'invite-item';
+        inviteItem.style.display = 'flex';
+        inviteItem.style.justifyContent = 'space-between';
+        inviteItem.style.alignItems = 'center';
+        inviteItem.style.padding = '8px';
+        inviteItem.style.background = 'rgba(255, 255, 255, 0.05)';
+        inviteItem.style.borderRadius = '6px';
+        inviteItem.style.marginBottom = '8px';
+        inviteItem.innerHTML = `
+          <span>${user.username}</span>
+          <button style="background: var(--accent); color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 12px;" onclick="removeInvite(${index})">Remove</button>
+        `;
+        inviteList.appendChild(inviteItem);
+      });
+    }
 
-              // Login
-        document.getElementById('login-btn').addEventListener('click', () => {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            auth.signInWithEmailAndPassword(email, password).catch(err => showToast(err.message));
+    // Remove user from invite list
+    function removeInvite(index) {
+      invitedUsers.splice(index, 1);
+      updateInviteList();
+    }
+
+    // Show event modal (placeholder)
+    function showEventModal() {
+      showToast('Event creation feature coming soon');
+    }
+
+    // Log out
+    function logout() {
+      auth.signOut()
+        .then(() => {
+          loggedIn = false;
+          joined = false;
+          modal.style.display = "none";
+          authBtn.textContent = "Sign Up";
+          authBtn.innerHTML = "Sign Up";
+          showToast('Logged out successfully');
+        })
+        .catch((error) => {
+          showToast('Error: ' + error.message);
         });
+    }
 
-        // Register
-        document.getElementById('register-btn').addEventListener('click', () => {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            auth.createUserWithEmailAndPassword(email, password).catch(err => showToast(err.message));
-        });
+    // Show toast notification
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add('show');
+      
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
 
-        // Save Profile
-        document.getElementById('save-profile-btn').addEventListener('click', async () => {
-            const username = document.getElementById('username').value;
-            const bio = document.getElementById('bio').value;
-            const file = document.getElementById('avatar-upload').files[0];
-
-            // Check unique username
-            const usernameQuery = await db.collection('profiles').where('username', '==', username).get();
-            if (!usernameQuery.empty) {
-                showToast('Username taken');
-                return;
-            }
-
-            let avatarUrl = '';
-            if (file) {
-                const ref = storage.ref(`profiles/${currentUser.uid}/avatar.jpg`);
-                await ref.put(file);
-                avatarUrl = await ref.getDownloadURL();
-            }
-
-            await db.collection('profiles').doc(currentUser.uid).set({
-                username,
-                bio,
-                avatarUrl,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            document.getElementById('profile-modal').style.display = 'none';
-        });
-
-        // Load Promo
-        async function loadPromo() {
-            const promoDoc = await db.doc('settings/promo').get();
-            if (promoDoc.exists) {
-                promoVideo.src = promoDoc.data().url;
-                promoVideo.play();
-            }
-        }
-
-        // Listen for active sessions
-        function listenForSessions() {
-            db.collection('sessions').where('status', '==', 'active').onSnapshot(snapshot => {
-                if (snapshot.empty) {
-                    // No live, show promo
-                    promoVideo.style.display = 'block';
-                    document.getElementById('jitsi-container').innerHTML = '';
-                    document.getElementById('join-live-btn').style.display = 'none';
-                    document.getElementById('open-space-ui').style.display = 'none';
-                    if (jitsiApi) jitsiApi.dispose();
-                    currentSessionId = null;
-                } else {
-                    // Assume first active session
-                    const session = snapshot.docs[0];
-                    currentSessionId = session.id;
-                    const data = session.data();
-                    sessionMode = data.mode;
-                    promoVideo.style.display = 'none';
-                    document.getElementById('join-live-btn').style.display = 'block';
-                    if (data.mode === 'audio') {
-                        document.getElementById('open-space-ui').style.display = 'flex';
-                    }
-                    // Listen for participants and overlays
-                    listenForParticipants();
-                }
-            });
-        }
-
-        // Join Live
-        document.getElementById('join-live-btn').addEventListener('click', async () => {
-            if (!currentSessionId) return;
-            const sessionDoc = await db.collection('sessions').doc(currentSessionId).get();
-            const data = sessionDoc.data();
-            if (!data.public) {
-                if (!data.invites || !data.invites.includes(currentUser.uid)) {
-                    showToast('You are not invited to this private session');
-                    return;
-                }
-            }
-
-            // Join
-            isJoined = true;
-            const profile = await db.collection('profiles').doc(currentUser.uid).get();
-            const username = profile.data().username;
-
-            const domain = 'meet.jit.si';
-            const options = {
-                roomName: data.room,
-                width: '100%',
-                height: '100%',
-                parentNode: document.getElementById('jitsi-container'),
-                userInfo: {
-                    displayName: username
-                },
-                configOverwrite: {
-                    prejoinPageEnabled: false,
-                    disableDeepLinking: true,
-                    startWithAudioMuted: true, // Initial mute
-                    startWithVideoMuted: sessionMode === 'audio',
-                },
-                interfaceConfigOverwrite: {
-                    SHOW_JITSI_WATERMARK: false,
-                    SHOW_WATERMARK_FOR_GUESTS: false,
-                    MOBILE_APP_PROMO: false,
-                    // Hide toolbar for custom UI in audio
-                    TOOLBAR_BUTTONS: sessionMode === 'audio' ? [] : undefined,
-                }
-            };
-            jitsiApi = new JitsiMeetExternalAPI(domain, options);
-
-            // Set role-based config
-            const participantDoc = await db.collection('sessions').doc(currentSessionId).collection('participants').doc(currentUser.uid).get();
-            let role = 'listener';
-            if (participantDoc.exists) {
-                role = participantDoc.data().role;
-            } else {
-                // Add participant
-                await db.collection('sessions').doc(currentSessionId).collection('participants').doc(currentUser.uid).set({
-                    role: 'listener',
-                    joined: true,
-                    requestedMic: false
-                });
-            }
-            if (role === 'speaker') {
-                jitsiApi.executeCommand('toggleAudio');
-                if (sessionMode === 'video') jitsiApi.executeCommand('toggleVideo');
-            }
-
-            // Events
-            jitsiApi.on('readyToClose', () => {
-                leaveSession();
-            });
-            window.addEventListener('beforeunload', leaveSession);
-
-            // For audio mode, hide video
-            if (sessionMode === 'audio') {
-                document.getElementById('jitsi-container').style.display = 'none'; // Offscreen audio
-            }
-
-            // Mark joined
-            await db.collection('sessions').doc(currentSessionId).collection('participants').doc(currentUser.uid).update({ joined: true });
-
-            document.getElementById('join-live-btn').style.display = 'none';
-        });
-
-        async function leaveSession() {
-            if (currentSessionId) {
-                await db.collection('sessions').doc(currentSessionId).collection('participants').doc(currentUser.uid).update({ joined: false });
-            }
-            if (jitsiApi) jitsiApi.dispose();
-            isJoined = false;
-        }
-
-        // Listen for participants
-        function listenForParticipants() {
-            if (!currentSessionId) return;
-            db.collection('sessions').doc(currentSessionId).collection('participants').onSnapshot(async snapshot => {
-                const speakers = [];
-                const listeners = [];
-                for (const doc of snapshot.docs) {
-                    if (doc.data().joined) {
-                        const profile = await db.collection('profiles').doc(doc.id).get();
-                        const userData = { ...profile.data(), role: doc.data().role };
-                        if (userData.role === 'speaker' || userData.role === 'host') {
-                            speakers.push(userData);
-                        } else {
-                            listeners.push(userData);
-                        }
-                    }
-                }
-                // Update overlays
-                updateOverlay('speakers-overlay', speakers.slice(0, 3));
-                updateOverlay('listeners-overlay', listeners.slice(0, 3));
-
-                // Update Open Space UI
-                if (sessionMode === 'audio') {
-                    updateOpenSpaceUI(speakers, listeners);
-                }
-
-                // If user is listener, show request mic
-                const myRole = snapshot.docs.find(d => d.id === currentUser.uid)?.data().role;
-                document.getElementById('request-mic-btn').style.display = myRole === 'listener' ? 'block' : 'none';
-            });
-        }
-
-        function updateOverlay(id, users) {
-            const container = document.getElementById(id);
-            container.innerHTML = '';
-            users.forEach(user => {
-                const chip = document.createElement('div');
-                chip.className = 'joiner-chip';
-                const avatar = document.createElement('img');
-                avatar.className = 'joiner-avatar';
-                avatar.src = user.avatarUrl || 'default-avatar.jpg';
-                const name = document.createElement('span');
-                name.textContent = user.username;
-                chip.appendChild(avatar);
-                chip.appendChild(name);
-                container.appendChild(chip);
-            });
-        }
-
-        function updateOpenSpaceUI(speakers, listeners) {
-            const list = document.getElementById('participants-list');
-            list.innerHTML = '';
-            [...speakers, ... (hideListeners ? [] : listeners)].forEach(user => {
-                const card = document.createElement('div');
-                card.className = 'participant-card';
-                const avatar = document.createElement('img');
-                avatar.className = 'participant-avatar';
-                avatar.src = user.avatarUrl || 'default-avatar.jpg';
-                const name = document.createElement('div');
-                name.textContent = user.username;
-                const role = document.createElement('div');
-                role.className = `role-${user.role}`;
-                role.textContent = user.role.charAt(0).toUpperCase() + user.role.slice(1);
-                card.appendChild(avatar);
-                card.appendChild(name);
-                card.appendChild(role);
-                list.appendChild(card);
-            });
-        }
-
-        // Request Mic
-        document.getElementById('request-mic-btn').addEventListener('click', async () => {
-            if (currentSessionId) {
-                await db.collection('sessions').doc(currentSessionId).collection('participants').doc(currentUser.uid).update({ requestedMic: true });
-                showToast('Mic request sent');
-            }
-        });
-
-        // Reactions
-        document.querySelectorAll('.reaction-btn').forEach(btn => {
-            btn.addEventListener('click', async () => {
-                if (currentSessionId) {
-                    const emoji = btn.dataset.emoji;
-                    await db.collection('sessions').doc(currentSessionId).collection('reactions').add({
-                        uid: currentUser.uid,
-                        emoji,
-                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                }
-            });
-        });
-
-        // Listen for reactions
-        function listenForReactions() {
-            if (!currentSessionId) return;
-            db.collection('sessions').doc(currentSessionId).collection('reactions').onSnapshot(snapshot => {
-                snapshot.docChanges().forEach(change => {
-                    if (change.type === 'added') {
-                        // Show floating emoji animation
-                        const data = change.doc.data();
-                        const floating = document.createElement('div');
-                        floating.textContent = data.emoji;
-                        floating.style.position = 'absolute';
-                        floating.style.fontSize = '30px';
-                        floating.style.animation = 'float 2s ease-out';
-                        floating.style.left = Math.random() * 100 + '%';
-                        floating.style.bottom = '0';
-                        document.getElementById('hero').appendChild(floating);
-                        setTimeout(() => floating.remove(), 2000);
-                    }
-                });
-            });
-        }
-        // Add @keyframes for float
-        const style = document.createElement('style');
-        style.textContent = '@keyframes float { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-200px); opacity: 0; } }';
-        document.head.appendChild(style);
-
-        // Hide Listeners
-        document.getElementById('hide-listeners-btn').addEventListener('click', () => {
-            hideListeners = !hideListeners;
-            listenForParticipants(); // Refresh UI
-        });
-
-        // Minimize
-        document.getElementById('minimize-btn').addEventListener('click', () => {
-            isMinimized = true;
-            document.getElementById('open-space-ui').style.display = 'none';
-            document.getElementById('minimized-bar').style.display = 'block';
-        });
-
-        document.getElementById('restore-btn').addEventListener('click', () => {
-            isMinimized = false;
-            document.getElementById('open-space-ui').style.display = 'flex';
-            document.getElementById('minimized-bar').style.display = 'none';
-        });
-      // Events Carousel
-        async function loadEvents() {
-            const events = await db.collection('events').get();
-            const carousel = document.getElementById('events-carousel');
-            carousel.innerHTML = '';
-            // Group into Live, Hosted, Upcoming
-            const now = new Date();
-            const live = events.docs.filter(d => new Date(d.data().date) <= now && d.data().status === 'live');
-            const upcoming = events.docs.filter(d => new Date(d.data().date) > now);
-            const hosted = events.docs.filter(d => new Date(d.data().date) < now && d.data().status !== 'live');
-            // Create cards
-            const liveCard = createEventCardGroup('Live Events', live);
-            const hostedCard = createEventCardGroup('Hosted Calls', hosted);
-            const upcomingCard = createEventCardGroup('Upcoming Events', upcoming);
-            carousel.appendChild(liveCard);
-            carousel.appendChild(hostedCard);
-            carousel.appendChild(upcomingCard);
-            // Animate
-            setInterval(() => {
-                const first = carousel.firstChild;
-                carousel.appendChild(first);
-            }, 4000);
-            // Swipe
-            let startX = 0;
-            carousel.addEventListener('touchstart', e => startX = e.touches[0].clientX);
-            carousel.addEventListener('touchend', e => {
-                const endX = e.changedTouches[0].clientX;
-                if (startX - endX > 50) {
-                    // Swipe left
-                    const first = carousel.firstChild;
-                    carousel.appendChild(first);
-                } else if (endX - startX > 50) {
-                    // Swipe right
-                    const last = carousel.lastChild;
-                    carousel.insertBefore(last, carousel.firstChild);
-                }
-            });
-        }
-
-        function createEventCardGroup(title, events) {
-            const card = document.createElement('div');
-            card.className = 'event-card';
-            const h3 = document.createElement('h3');
-            h3.textContent = title;
-            card.appendChild(h3);
-            events.forEach(event => {
-                const p = document.createElement('p');
-                p.textContent = `${event.data().title} - ${event.data().date}`;
-                card.appendChild(p);
-            });
-            return card;
-        }
-        loadEvents();
-
-        // Admin Panel Toggle
-        document.getElementById('admin-btn').addEventListener('click', () => {
-            const panel = document.getElementById('admin-panel');
-            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
-            if (!isAdmin) {
-                panel.innerHTML = '<h2>You are not an admin</h2>';
-                return;
-            }
-            // Load admin data
-            loadAdminParticipants();
-            loadAdminEvents();
-            loadInvites();
-        });
-
-        // Toggle cards
-        document.querySelectorAll('.toggle-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const target = document.getElementById(btn.dataset.target);
-                target.style.display = target.style.display === 'none' ? 'block' : 'none';
-            });
-        });
-
-        // Start Live
-        document.getElementById('start-live-btn').addEventListener('click', async () => {
-            const mode = document.getElementById('mode-select').value;
-            const isPublic = document.getElementById('public-private-select').value === 'public';
-            const room = `room-${Date.now()}`;
-            await db.collection('sessions').add({
-                room,
-                mode,
-                status: 'active',
-                public: isPublic,
-                invites: []
-            });
-            showToast('Live started');
-        });
-
-        // End Live
-        document.getElementById('end-live-btn').addEventListener('click', async () => {
-            if (currentSessionId) {
-                await db.collection('sessions').doc(currentSessionId).update({ status: 'ended' });
-                showToast('Live ended');
-            }
-        });
-
-        // Restart
-        document.getElementById('restart-live-btn').addEventListener('click', async () => {
-            if (currentSessionId) {
-                await db.collection('sessions').doc(currentSessionId).update({ status: 'ended' });
-            }
-            // Start new
-            document.getElementById('start-live-btn').click();
-        });
-
-        // Save Promo
-        document.getElementById('save-promo-btn').addEventListener('click', async () => {
-            const url = document.getElementById('promo-url-input').value;
-            await db.doc('settings/promo').set({ url });
-            loadPromo();
-            showToast('Promo updated');
-        });
-
-        // Pause Promo (admin only)
-        document.getElementById('pause-promo-btn').addEventListener('click', () => {
-            if (promoVideo.paused) {
-                promoVideo.play();
-            } else {
-                promoVideo.pause();
-            }
-        });
-
-        // Start Broadcast
-        document.getElementById('start-broadcast-btn').addEventListener('click', () => {
-            const rtmp = document.getElementById('rtmp-url-input').value;
-            const key = document.getElementById('stream-key-input').value;
-            if (jitsiApi) {
-                // Assuming self-hosted for RTMP, may not work on meet.jit.si
-                jitsiApi.executeCommand('startRecording', {
-                    mode: 'stream',
-                    rtmpStreamKey: `${rtmp}/${key}` // Format may vary
-                });
-                showToast('Broadcast started (requires backend config)');
-            }
-        });
-
-        // Public/Private change
-        document.getElementById('public-private-select').addEventListener('change', async (e) => {
-            const isPublic = e.target.value === 'public';
-            document.getElementById('invites-section').style.display = isPublic ? 'none' : 'block';
-            if (currentSessionId) {
-                await db.collection('sessions').doc(currentSessionId).update({ public: isPublic });
-            }
-        });
-
-        // Add Invite
-        document.getElementById('add-invite-btn').addEventListener('click', async () => {
-            const uid = document.getElementById('invite-user-input').value;
-            if (currentSessionId) {
-                await db.collection('sessions').doc(currentSessionId).update({
-                    invites: firebase.firestore.FieldValue.arrayUnion(uid)
-                });
-                loadInvites();
-            }
-        });
-
-        async function loadInvites() {
-            if (currentSessionId) {
-                const session = await db.collection('sessions').doc(currentSessionId).get();
-                const invites = session.data().invites || [];
-                const list = document.getElementById('invites-list');
-                list.innerHTML = '';
-                invites.forEach(async uid => {
-                    const profile = await db.collection('profiles').doc(uid).get();
-                    const div = document.createElement('div');
-                    div.textContent = profile.data().username;
-                    const removeBtn = document.createElement('button');
-                    removeBtn.textContent = 'Remove';
-                    removeBtn.addEventListener('click', async () => {
-                        await db.collection('sessions').doc(currentSessionId).update({
-                            invites: firebase.firestore.FieldValue.arrayRemove(uid)
-                        });
-                        loadInvites();
-                    });
-                    div.appendChild(removeBtn);
-                    list.appendChild(div);
-                });
-            }
-        }
-
-        // Load Admin Participants
-        function loadAdminParticipants() {
-            if (!currentSessionId) return;
-            db.collection('sessions').doc(currentSessionId).collection('participants').onSnapshot(snapshot => {
-                const list = document.getElementById('participants-list-admin');
-                list.innerHTML = '';
-                const requests = document.getElementById('mic-requests');
-                requests.innerHTML = '';
-                snapshot.docs.forEach(doc => {
-                    const data = doc.data();
-                    const div = document.createElement('div');
-                    div.textContent = `User: ${doc.id}, Role: ${data.role}`;
-                    const promoteBtn = document.createElement('button');
-                    promoteBtn.textContent = 'Promote to Speaker';
-                    promoteBtn.addEventListener('click', () => {
-                        doc.ref.update({ role: 'speaker', requestedMic: false });
-                    });
-                    const muteBtn = document.createElement('button');
-                    muteBtn.textContent = 'Mute';
-                    muteBtn.addEventListener('click', () => {
-                        // Use Jitsi to mute if possible
-                        // For now, set flag
-                        doc.ref.update({ muted: true });
-                        // Client listens and mutes
-                    });
-                    div.appendChild(promoteBtn);
-                    div.appendChild(muteBtn);
-                    list.appendChild(div);
-
-                    if (data.requestedMic) {
-                        const reqDiv = document.createElement('div');
-                        reqDiv.textContent = `Mic request from ${doc.id}`;
-                        const approve = document.createElement('button');
-                        approve.textContent = 'Approve';
-                        approve.addEventListener('click', () => {
-                            doc.ref.update({ role: 'speaker', requestedMic: false });
-                        });
-                        const deny = document.createElement('button');
-                        deny.textContent = 'Deny';
-                        deny.addEventListener('click', () => {
-                            doc.ref.update({ requestedMic: false });
-                        });
-                        reqDiv.appendChild(approve);
-                        reqDiv.appendChild(deny);
-                        requests.appendChild(reqDiv);
-                    }
-                });
-            });
-        }
-
-        // Create Event
-        document.getElementById('create-event-btn').addEventListener('click', async () => {
-            const title = document.getElementById('event-title').value;
-            const date = document.getElementById('event-date').value;
-            const desc = document.getElementById('event-desc').value;
-            await db.collection('events').add({
-                title,
-                date,
-                description: desc,
-                status: 'upcoming'
-            });
-            loadEvents();
-            loadAdminEvents();
-            showToast('Event created');
-        });
-
-        // Load Admin Events
-        async function loadAdminEvents() {
-            const events = await db.collection('events').get();
-            const list = document.getElementById('events-list-admin');
-            list.innerHTML = '';
-            events.docs.forEach(doc => {
-                const div = document.createElement('div');
-                div.textContent = `${doc.data().title} - ${doc.data().date}`;
-                const editBtn = document.createElement('button');
-                editBtn.textContent = 'Edit';
-                editBtn.addEventListener('click', () => {
-                    // TODO: Implement edit form
-                    showToast('Edit not implemented yet');
-                });
-                const deleteBtn = document.createElement('button');
-                deleteBtn.textContent = 'Delete';
-                deleteBtn.addEventListener('click', async () => {
-                    await doc.ref.delete();
-                    loadEvents();
-                    loadAdminEvents();
-                });
-                div.appendChild(editBtn);
-                div.appendChild(deleteBtn);
-                list.appendChild(div);
-            });
-        }
-
-        // Record
-        document.getElementById('record-btn').addEventListener('click', () => {
-            if (jitsiApi) {
-                jitsiApi.executeCommand('startRecording', { mode: 'file' });
-                showToast('Recording started (requires backend)');
-            }
-        });
-        if (isAdmin) document.getElementById('record-btn').style.display = 'block';
-
-        // Call listenForReactions
-        listenForReactions();
-    </script>
+    // Initialize when page loads
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
 </body>
 </html>
